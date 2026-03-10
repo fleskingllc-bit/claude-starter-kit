@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude 導入マニュアル</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #FFFFFF;
+    --bg-warm: #FAF7F5;
+    --bg-card: #F5F5F7;
+    --bg-card-warm: #F7F2EB;
+    --accent: #E68C38;
+    --accent-dark: #B86B24;
+    --accent-soft: #F2D19E;
+    --blue: #0071E3;
+    --text: #1D1D1F;
+    --text-2: #6E6E73;
+    --text-3: #99999E;
+    --border: #E5E7EB;
+    --green: #34C759;
+    --red: #FF3B30;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans JP', -apple-system, sans-serif;
+    color: var(--text);
+    line-height: 1.8;
+    background: var(--bg);
+  }
+
+  @media print {
+    body { font-size: 10.5pt; }
+    .page-break { page-break-before: always; }
+    .no-print { display: none; }
+    a { color: var(--blue); }
+    .step-card, .info-box { break-inside: avoid; }
+  }
+
+  /* Cover */
+  .cover {
+    background: var(--bg);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 60px 80px;
+    border-top: 6px solid var(--accent);
+  }
+  .cover h1 { font-size: 40px; font-weight: 900; color: var(--text); line-height: 1.3; }
+  .cover .subtitle { font-size: 18px; color: var(--text-2); margin-top: 12px; }
+  .cover .divider { width: 80px; height: 3px; background: var(--accent); margin: 30px 0; }
+  .cover .meta { font-size: 14px; color: var(--text-2); }
+  .cover .meta .author { font-size: 16px; color: var(--text); margin-bottom: 4px; }
+  .cover .version { position: absolute; bottom: 40px; right: 60px; font-size: 12px; color: var(--text-3); }
+
+  /* Content */
+  .content { max-width: 780px; margin: 0 auto; padding: 50px 40px; }
+
+  /* Chapter heading */
+  .chapter-heading {
+    font-size: 12px; font-weight: 700; color: var(--accent);
+    text-transform: uppercase; letter-spacing: 2px;
+    margin-bottom: 4px;
+  }
+  h2 {
+    font-size: 26px; font-weight: 700; color: var(--text);
+    margin-bottom: 8px; padding-bottom: 10px;
+    border-bottom: 2px solid var(--accent-soft);
+  }
+  h3 { font-size: 18px; font-weight: 700; color: var(--text); margin-top: 28px; margin-bottom: 10px; }
+  h4 { font-size: 15px; font-weight: 700; color: var(--text); margin-top: 16px; margin-bottom: 6px; }
+  p { margin-bottom: 14px; font-size: 14.5px; }
+
+  /* Section number */
+  .sec-num {
+    display: inline-block;
+    background: var(--accent);
+    color: white;
+    font-weight: 700;
+    font-size: 13px;
+    padding: 2px 10px;
+    border-radius: 4px;
+    margin-right: 8px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* Step card */
+  .step-card {
+    background: var(--bg-card);
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin: 20px 0;
+    border-left: 4px solid var(--accent);
+  }
+  .step-card.highlight {
+    background: var(--bg-card-warm);
+    border-left-color: var(--accent-dark);
+  }
+
+  /* Code */
+  .code-block {
+    background: #1D1D1F;
+    color: #E8E8E8;
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin: 10px 0 18px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13.5px;
+    line-height: 1.6;
+    position: relative;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .code-block .label {
+    position: absolute; top: 6px; right: 10px;
+    font-size: 10px; color: var(--text-3);
+    font-family: 'Noto Sans JP', sans-serif;
+  }
+  .code-block .prompt { color: var(--accent); }
+  .code-block .comment { color: #6A737D; }
+
+  /* URL box */
+  .url-box {
+    background: #EEF4FF;
+    border: 1.5px solid var(--blue);
+    border-radius: 8px;
+    padding: 12px 18px;
+    margin: 10px 0 18px;
+  }
+  .url-box a { color: var(--blue); font-weight: 500; word-break: break-all; font-size: 14px; }
+  .url-box .label { font-size: 10px; color: var(--text-3); font-weight: 700; text-transform: uppercase; margin-bottom: 2px; }
+
+  /* Info box */
+  .info-box {
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin: 14px 0;
+    font-size: 13.5px;
+    line-height: 1.7;
+  }
+  .info-box.tip { background: #F0F9FF; border: 1px solid #BAE6FD; }
+  .info-box.warn { background: #FFFBEB; border: 1px solid #FDE68A; }
+  .info-box.success { background: #F0FDF4; border: 1px solid #BBF7D0; }
+  .info-box.danger { background: #FEF2F2; border: 1px solid #FECACA; }
+  .info-box strong { font-size: 14px; }
+
+  /* Checklist */
+  .checklist { list-style: none; padding: 0; margin: 14px 0; }
+  .checklist li {
+    padding: 7px 0 7px 30px; position: relative;
+    font-size: 14px; border-bottom: 1px solid var(--border);
+  }
+  .checklist li::before {
+    content: '[ ]'; position: absolute; left: 0;
+    font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--text-3);
+  }
+
+  /* Table */
+  table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 13.5px; }
+  th { background: var(--bg-card); color: var(--text); padding: 9px 14px; text-align: left; font-weight: 600; border-bottom: 2px solid var(--border); }
+  td { padding: 9px 14px; border-bottom: 1px solid var(--border); }
+
+  /* TOC */
+  .toc { background: var(--bg-card); border-radius: 12px; padding: 24px 28px; margin: 20px 0 36px; }
+  .toc h3 { margin-top: 0; font-size: 17px; }
+  .toc ol { padding-left: 0; margin: 10px 0 0; list-style: none; counter-reset: toc; }
+  .toc > ol > li { counter-increment: toc; padding: 3px 0; font-size: 14px; font-weight: 600; }
+  .toc > ol > li::before { content: counter(toc) "."; color: var(--accent); font-weight: 700; margin-right: 6px; }
+  .toc ol ol { padding-left: 24px; margin: 4px 0; }
+  .toc ol ol li { font-weight: 400; font-size: 13px; color: var(--text-2); padding: 2px 0; }
+  .toc a { color: var(--text); text-decoration: none; }
+
+  /* Substep numbering */
+  .steps { counter-reset: substep; }
+  .substep {
+    counter-increment: substep;
+    padding: 12px 0 12px 38px;
+    position: relative;
+    border-bottom: 1px solid var(--border);
+  }
+  .substep:last-child { border-bottom: none; }
+  .substep::before {
+    content: counter(substep);
+    position: absolute; left: 0; top: 12px;
+    width: 24px; height: 24px;
+    background: var(--accent); color: white;
+    border-radius: 50%; text-align: center;
+    line-height: 24px; font-size: 12px; font-weight: 700;
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center; padding: 36px;
+    font-size: 12px; color: var(--text-3);
+    border-top: 1px solid var(--border); margin-top: 50px;
+  }
+
+  .file-tree {
+    background: var(--bg-card);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 10px 0 18px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.8;
+    color: var(--text-2);
+    white-space: pre;
+  }
+
+  /* Path selector */
+  .path-selector {
+    display: flex; gap: 12px; margin: 16px 0;
+  }
+  .path-btn {
+    flex: 1;
+    padding: 16px 20px;
+    border-radius: 12px;
+    border: 2px solid var(--border);
+    background: var(--bg);
+    cursor: default;
+    text-align: center;
+  }
+  .path-btn.active {
+    border-color: var(--accent);
+    background: var(--bg-card-warm);
+  }
+  .path-btn .path-icon { font-size: 28px; margin-bottom: 6px; }
+  .path-btn .path-label { font-size: 14px; font-weight: 700; }
+  .path-btn .path-desc { font-size: 12px; color: var(--text-2); margin-top: 2px; }
+
+  /* Flow diagram */
+  .flow-diagram {
+    background: var(--bg-card);
+    border-radius: 12px;
+    padding: 24px;
+    margin: 20px 0;
+    text-align: center;
+  }
+  .flow-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin: 8px 0;
+    flex-wrap: wrap;
+  }
+  .flow-box {
+    background: white;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .flow-box.highlight-box {
+    background: var(--bg-card-warm);
+    border-color: var(--accent);
+    color: var(--accent-dark);
+    font-weight: 700;
+  }
+  .flow-arrow { color: var(--text-3); font-size: 18px; }
+
+  /* Chapter badge - large visual indicator of who should read */
+  .chapter-badge {
+    display: inline-block;
+    padding: 6px 20px;
+    border-radius: 20px;
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
+  }
+  .chapter-badge.all {
+    background: #EEF4FF;
+    color: #0051A8;
+    border: 2px solid #B3D4FF;
+  }
+  .chapter-badge.dev {
+    background: #FFF3E0;
+    color: #B86B24;
+    border: 2px solid #F2D19E;
+  }
+
+  /* Chapter border color override for developer-only chapters */
+  .content.dev-only {
+    border-left: 5px solid var(--accent);
+    padding-left: 35px;
+    margin-left: 20px;
+    background: linear-gradient(to right, #FFFAF5 0%, white 40px);
+  }
+  .content.dev-only h2 {
+    border-bottom-color: var(--accent);
+  }
+
+  /* Path cards - larger, color-coded */
+  .path-card {
+    flex: 1;
+    padding: 24px;
+    border-radius: 16px;
+    text-align: center;
+  }
+  .path-card.path-a {
+    background: #EEF4FF;
+    border: 3px solid #0071E3;
+  }
+  .path-card.path-b {
+    background: #FFF3E0;
+    border: 3px solid var(--accent);
+  }
+  .path-card .path-letter {
+    font-size: 48px;
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .path-card.path-a .path-letter { color: #0071E3; }
+  .path-card.path-b .path-letter { color: var(--accent); }
+  .path-card .path-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .path-card .path-sub {
+    font-size: 14px;
+    color: var(--text-2);
+  }
+
+  /* SVG diagram container */
+  .svg-diagram {
+    margin: 24px 0;
+    text-align: center;
+  }
+  .svg-diagram svg {
+    max-width: 100%;
+    height: auto;
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== 表紙 ===== -->
+<div class="cover">
+  <h1>Claude<br>導入マニュアル</h1>
+  <p class="subtitle">AIエージェント導入ガイド — ビジネスユーザー &amp; 開発者</p>
+  <div class="divider"></div>
+  <div class="meta">
+    <p class="author">作成: 谷本幹人</p>
+    <p>flesking.llc@gmail.com | 090-5502-2097</p>
+  </div>
+  <p class="version">Version 3.0 | 2026年3月</p>
+</div>
+
+<!-- ===== 目次 ===== -->
+<div class="content page-break">
+  <div class="toc">
+    <h3>目次</h3>
+    <ol>
+      <li><a href="#ch1">はじめに — Claude の3つのモード</a>
+        <ol>
+          <li><a href="#s1-1">このマニュアルについて</a></li>
+          <li><a href="#s1-2">Claude の3つのモード</a></li>
+          <li><a href="#s1-3">あなたはどちらのタイプ？</a></li>
+          <li><a href="#s1-4">必要なもの</a></li>
+          <li><a href="#s1-5">全体の流れ</a></li>
+        </ol>
+      </li>
+      <li><a href="#ch2">Claude アカウント作成</a>
+        <ol>
+          <li><a href="#s2-1">アカウント登録</a></li>
+          <li><a href="#s2-2">Proプラン契約</a></li>
+        </ol>
+      </li>
+      <li><a href="#ch3a">【ビジネス】Claude Desktop インストール</a>
+        <ol>
+          <li><a href="#s3a-1">アプリのダウンロード</a></li>
+          <li><a href="#s3a-2">初回ログイン</a></li>
+          <li><a href="#s3a-3">Chat モードで動作確認</a></li>
+          <li><a href="#s3a-4">Cowork モードを試す</a></li>
+        </ol>
+      </li>
+      <li><a href="#ch3b">【開発者】Claude Code 有効化</a>
+        <ol>
+          <li><a href="#s3b-1">Code タブの有効化</a></li>
+          <li><a href="#s3b-2">動作確認テスト</a></li>
+          <li><a href="#s3b-3">ターミナル版について（上級者向け）</a></li>
+        </ol>
+      </li>
+      <li><a href="#ch4">Google Drive デスクトップ 導入</a>
+        <ol>
+          <li><a href="#s4-1">アプリのインストール</a></li>
+          <li><a href="#s4-2">ログインと同期設定</a></li>
+          <li><a href="#s4-3">Obsidian Vault フォルダの作成</a></li>
+        </ol>
+      </li>
+      <li><a href="#ch5">Obsidian 導入と初期設定</a>
+        <ol>
+          <li><a href="#s5-1">Obsidian のインストール</a></li>
+          <li><a href="#s5-2">Vault（保管庫）の設定</a></li>
+          <li><a href="#s5-3">フォルダ構成について</a></li>
+        </ol>
+      </li>
+      <li><a href="#ch6">Claude 初期設定</a>
+        <ol>
+          <li><a href="#s6-1">スターターキットのダウンロード</a></li>
+          <li><a href="#s6-2">CLAUDE.md とは</a></li>
+          <li><a href="#s6-3">Claude に初期設定してもらう</a></li>
+          <li><a href="#s6-4">設定内容の確認</a></li>
+          <li><a href="#s6-5">便利な機能:「/wrap」で作業記録</a></li>
+        </ol>
+      </li>
+      <li><a href="#ch7">トラブルシューティング</a>
+        <ol>
+          <li><a href="#s7-1">よくある問題と解決法</a></li>
+          <li><a href="#s7-2">診断コマンド</a></li>
+        </ol>
+      </li>
+      <li><a href="#ch8">ヘルプ・サポート</a>
+        <ol>
+          <li><a href="#s8-1">つまづいたときの連絡方法</a></li>
+          <li><a href="#s8-2">参考リンク</a></li>
+        </ol>
+      </li>
+    </ol>
+  </div>
+</div>
+
+<!-- ===== Chapter 1 ===== -->
+<div class="content page-break" id="ch1">
+  <div class="chapter-heading">Chapter 1</div>
+  <h2>はじめに — Claude の3つのモード</h2>
+
+  <h3 id="s1-1"><span class="sec-num">1.1</span> このマニュアルについて</h3>
+  <p>このマニュアルは、AIエージェント「Claude」を確実に導入するためのガイドです。</p>
+  <p>Claude には<strong>3つの使い方（モード）</strong>があり、あなたの役割に合った方法で導入します。各ステップでURLをクリックし、コマンドをコピー＆ペーストするだけで完了します。</p>
+  <p>途中で困った場合は、<strong>セクション番号（例: 3A.2）</strong>を控えてサポートにご連絡ください。</p>
+
+  <h3 id="s1-2"><span class="sec-num">1.2</span> Claude の3つのモード</h3>
+
+  <div class="step-card">
+    <h4>Chat — 会話する</h4>
+    <p>ブラウザやアプリで Claude と対話します。質問に答えてもらったり、文章を作ってもらったり。<br>
+    最も基本的なモードです。<strong>全員が使います。</strong></p>
+  </div>
+
+  <div class="step-card highlight">
+    <h4>Cowork — 納品してもらう</h4>
+    <p>Claude に仕事を「丸ごと任せる」モードです。<br>
+    たとえば「このフォルダの資料から経営会議用のスライドを作って」と指示すると、<strong>あなたがPCから離れている間に作業を進めて、完成品を納品</strong>してくれます。</p>
+    <div class="info-box tip">
+      <strong>Chat との違い:</strong> Chat は「会話のキャッチボール」。Cowork は「仕事を渡して、できあがりを受け取る」。
+    </div>
+  </div>
+
+  <div class="step-card">
+    <h4>Code — 開発する</h4>
+    <p>ターミナル（黒い画面）で Claude に指示を出し、プログラムやツールを開発するモードです。<br>
+    社内ツール・自動化の仕組み・Webサービスなどを構築できます。<strong>開発担当者が使います。</strong></p>
+  </div>
+
+  <!-- SVG: Chat vs Cowork フロー図 -->
+  <div class="svg-diagram">
+    <svg viewBox="0 0 700 420" xmlns="http://www.w3.org/2000/svg" style="max-width: 700px;">
+      <!-- Background -->
+      <rect width="700" height="420" rx="16" fill="#F5F5F7"/>
+
+      <!-- Title -->
+      <text x="350" y="36" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="20" font-weight="900" fill="#1D1D1F">Chatは「会話」する。Coworkは「納品」する。</text>
+
+      <!-- === Chat Flow === -->
+      <text x="350" y="72" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="13" fill="#6E6E73">Chat のフロー</text>
+
+      <!-- Person icon -->
+      <circle cx="70" cy="115" r="18" fill="#E5E7EB" stroke="#6E6E73" stroke-width="1.5"/>
+      <circle cx="70" cy="108" r="7" fill="#6E6E73"/>
+      <path d="M56 128 C56 120, 84 120, 84 128" fill="#6E6E73"/>
+
+      <!-- Arrow 1 -->
+      <line x1="96" y1="115" x2="130" y2="115" stroke="#CCCCCC" stroke-width="2" marker-end="url(#arrowGray)"/>
+
+      <!-- Speech bubble -->
+      <rect x="135" y="96" width="100" height="38" rx="8" fill="white" stroke="#E5E7EB" stroke-width="1.5"/>
+      <text x="185" y="120" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="12" font-weight="600" fill="#1D1D1F">質問する</text>
+
+      <!-- Arrow 2 -->
+      <line x1="242" y1="115" x2="276" y2="115" stroke="#CCCCCC" stroke-width="2" marker-end="url(#arrowGray)"/>
+
+      <!-- Document icon -->
+      <rect x="281" y="96" width="100" height="38" rx="8" fill="white" stroke="#E5E7EB" stroke-width="1.5"/>
+      <text x="331" y="120" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="12" font-weight="600" fill="#1D1D1F">回答を読む</text>
+
+      <!-- Arrow 3 -->
+      <line x1="388" y1="115" x2="422" y2="115" stroke="#CCCCCC" stroke-width="2" marker-end="url(#arrowGray)"/>
+
+      <!-- Word copy -->
+      <rect x="427" y="96" width="120" height="38" rx="8" fill="white" stroke="#E5E7EB" stroke-width="1.5"/>
+      <text x="487" y="112" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="11" fill="#6E6E73">自分で</text>
+      <text x="487" y="127" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="12" font-weight="600" fill="#1D1D1F">Wordにコピペ</text>
+
+      <!-- Arrow 4 -->
+      <line x1="554" y1="115" x2="578" y2="115" stroke="#CCCCCC" stroke-width="2" marker-end="url(#arrowGray)"/>
+
+      <!-- Excel -->
+      <rect x="583" y="96" width="100" height="38" rx="8" fill="white" stroke="#E5E7EB" stroke-width="1.5"/>
+      <text x="633" y="112" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="11" fill="#6E6E73">自分で</text>
+      <text x="633" y="127" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="12" font-weight="600" fill="#1D1D1F">Excelを作る</text>
+
+      <!-- Effort indicator -->
+      <text x="550" y="155" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="11" fill="#FF3B30">← あなたの手作業が多い</text>
+
+      <!-- Divider -->
+      <line x1="40" y1="180" x2="660" y2="180" stroke="#E5E7EB" stroke-width="1" stroke-dasharray="6,4"/>
+
+      <!-- === Cowork Flow === -->
+      <text x="350" y="212" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="13" fill="#6E6E73">Cowork のフロー</text>
+
+      <!-- Person icon -->
+      <circle cx="70" cy="260" r="18" fill="#FFF3E0" stroke="#E68C38" stroke-width="1.5"/>
+      <circle cx="70" cy="253" r="7" fill="#E68C38"/>
+      <path d="M56 273 C56 265, 84 265, 84 273" fill="#E68C38"/>
+
+      <!-- Speech bubble (instruction) -->
+      <rect x="100" y="235" width="180" height="50" rx="10" fill="#FFF3E0" stroke="#E68C38" stroke-width="2"/>
+      <text x="190" y="256" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="11" font-weight="600" fill="#B86B24">「この資料から</text>
+      <text x="190" y="273" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="11" font-weight="600" fill="#B86B24">経営会議用スライドを作って」</text>
+
+      <!-- Arrow -->
+      <line x1="288" y1="260" x2="330" y2="260" stroke="#E68C38" stroke-width="2.5" marker-end="url(#arrowOrange)"/>
+
+      <!-- Walking away icon -->
+      <g transform="translate(355, 238)">
+        <rect x="-20" y="-4" width="80" height="48" rx="8" fill="white" stroke="#E5E7EB" stroke-width="1.5"/>
+        <text x="20" y="14" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="20">🚶</text>
+        <text x="20" y="34" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="10" font-weight="600" fill="#6E6E73">PCから離れる</text>
+      </g>
+
+      <!-- Arrow -->
+      <line x1="422" y1="260" x2="464" y2="260" stroke="#E68C38" stroke-width="2.5" marker-end="url(#arrowOrange)"/>
+
+      <!-- Clock icon -->
+      <g transform="translate(489, 238)">
+        <rect x="-20" y="-4" width="70" height="48" rx="8" fill="white" stroke="#E5E7EB" stroke-width="1.5"/>
+        <text x="15" y="14" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="20">⏰</text>
+        <text x="15" y="34" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="10" font-weight="600" fill="#6E6E73">20分後…</text>
+      </g>
+
+      <!-- Arrow -->
+      <line x1="544" y1="260" x2="576" y2="260" stroke="#E68C38" stroke-width="2.5" marker-end="url(#arrowOrange)"/>
+
+      <!-- Completed file -->
+      <rect x="581" y="236" width="100" height="48" rx="10" fill="#E68C38" stroke="#B86B24" stroke-width="2"/>
+      <text x="631" y="257" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="12" font-weight="700" fill="white">完成!</text>
+      <text x="631" y="274" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="10" fill="white">スライドが届く</text>
+
+      <!-- Benefit text -->
+      <text x="550" y="306" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="11" fill="#34C759" font-weight="600">← あなたは何もしなくてOK</text>
+
+      <!-- Bottom message -->
+      <rect x="100" y="340" width="500" height="60" rx="12" fill="#FFF3E0"/>
+      <text x="350" y="365" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="16" font-weight="900" fill="#B86B24">AIがチャットボックスから飛び出し、</text>
+      <text x="350" y="387" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="16" font-weight="900" fill="#B86B24">あなたのフォルダ内で手足となって働く時代。</text>
+
+      <!-- Arrow markers -->
+      <defs>
+        <marker id="arrowGray" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+          <path d="M0,0 L8,4 L0,8 Z" fill="#CCCCCC"/>
+        </marker>
+        <marker id="arrowOrange" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+          <path d="M0,0 L8,4 L0,8 Z" fill="#E68C38"/>
+        </marker>
+      </defs>
+    </svg>
+  </div>
+
+  <h3 id="s1-3"><span class="sec-num">1.3</span> あなたはどちらのタイプ？</h3>
+
+  <div class="path-selector" style="gap: 20px; margin: 24px 0;">
+    <div class="path-card path-a">
+      <div class="path-letter">A</div>
+      <div class="path-title">ビジネスユーザー</div>
+      <div class="path-sub">経営者・管理職・一般社員</div>
+    </div>
+    <div class="path-card path-b">
+      <div class="path-letter">B</div>
+      <div class="path-title">開発者（キーマン）</div>
+      <div class="path-sub">社内ツール開発・自動化担当</div>
+    </div>
+  </div>
+
+  <table>
+    <tr><th></th><th style="background:#EEF4FF; color:#0051A8; font-size:15px;">A. ビジネスユーザー</th><th style="background:#FFF3E0; color:#B86B24; font-size:15px;">B. 開発者</th></tr>
+    <tr><td><strong>主な作業</strong></td><td>レポート確認、資料作成、<br>議事録対応、メモ</td><td>社内ツール構築、<br>自動化、サービス開発</td></tr>
+    <tr><td><strong>使うモード</strong></td><td>Chat + Cowork</td><td>Chat + Cowork + Code</td></tr>
+    <tr><td><strong>インストール</strong></td><td>Claude Desktop<br>（アプリを入れるだけ）</td><td>Claude Desktop +<br>Claude Code（CLI）</td></tr>
+    <tr><td><strong>PC要件</strong></td><td>既存PCで十分</td><td>開発用PC（母艦PC）推奨</td></tr>
+    <tr><td><strong>読む章</strong></td>
+      <td style="background:#EEF4FF; font-size:15px; font-weight:700;">2章 → 3A章 → 4〜6章</td>
+      <td style="background:#FFF3E0; font-size:15px; font-weight:700;">2章 → 3A章 + 3B章 → 4〜6章</td>
+    </tr>
+  </table>
+
+  <div class="info-box warn" style="font-size: 15px;">
+    <strong style="font-size: 16px;">どちらかわからない場合は「A. ビジネスユーザー」で進めてください。</strong><br>
+    後から開発者向けの設定を追加することもできます。<br>
+    <strong>3B章（オレンジ色の章）は開発者だけが読めばOKです。</strong>
+  </div>
+
+  <h3 id="s1-4"><span class="sec-num">1.4</span> 必要なもの</h3>
+  <ul class="checklist">
+    <li>インターネット接続（Wi-Fi または有線LAN）</li>
+    <li>メールアドレス（Google アカウント推奨）</li>
+    <li>クレジットカード（Pro プラン契約用・月額約3,000円）</li>
+    <li>PC の管理者権限（ソフトをインストールできること）</li>
+  </ul>
+
+  <h3 id="s1-5"><span class="sec-num">1.5</span> 全体の流れ</h3>
+  <table>
+    <tr><th>章</th><th>内容</th><th>目安時間</th><th>対象</th></tr>
+    <tr><td>2章</td><td>Claude アカウント作成 + Pro 契約</td><td>5分</td><td>全員</td></tr>
+    <tr><td>3A章</td><td>Claude Desktop インストール</td><td>5分</td><td>全員</td></tr>
+    <tr><td>3B章</td><td>Claude Code 有効化</td><td>3分</td><td>開発者のみ</td></tr>
+    <tr><td>4章</td><td>Google Drive デスクトップ導入</td><td>10分</td><td>全員</td></tr>
+    <tr><td>5章</td><td>Obsidian 導入と初期設定</td><td>10分</td><td>全員</td></tr>
+    <tr><td>6章</td><td>Claude 初期設定（CLAUDE.md）</td><td>10分</td><td>全員</td></tr>
+    <tr><td colspan="2"><strong>合計</strong></td><td><strong>約40〜50分</strong></td><td></td></tr>
+  </table>
+
+  <div class="info-box warn">
+    <strong>費用について:</strong> Claude Pro プランは月額 $20（約3,000円）です。それ以外のソフト（Google Drive、Obsidian、Claude Desktop）はすべて無料です。
+  </div>
+</div>
+
+<!-- ===== Chapter 2 ===== -->
+<div class="content page-break" id="ch2">
+  <div class="chapter-badge all">全員が読む章</div>
+  <div class="chapter-heading">Chapter 2</div>
+  <h2>Claude アカウント作成</h2>
+
+  <h3 id="s2-1"><span class="sec-num">2.1</span> アカウント登録</h3>
+  <div class="steps">
+    <div class="substep">
+      <p><strong>以下のURLを開いてください。</strong></p>
+      <div class="url-box">
+        <div class="label">アクセス先</div>
+        <a href="https://claude.ai/login" target="_blank">https://claude.ai/login</a>
+      </div>
+    </div>
+    <div class="substep">
+      <p><strong>「Sign up」（新規登録）をクリックします。</strong></p>
+      <p>すでにアカウントをお持ちの場合は「Log in」からログインし、2.2 へ進んでください。</p>
+    </div>
+    <div class="substep">
+      <p><strong>登録方法を選びます。</strong></p>
+      <table>
+        <tr><th>方法</th><th>手順</th><th>おすすめ度</th></tr>
+        <tr><td><strong>Google アカウント</strong></td><td>「Continue with Google」をクリック</td><td>★★★</td></tr>
+        <tr><td>メールアドレス</td><td>メール入力 → 確認コード入力</td><td>★★</td></tr>
+      </table>
+      <div class="info-box success">
+        <strong>Google アカウントでの登録を推奨します。</strong>パスワード管理が不要で最も簡単です。
+      </div>
+    </div>
+    <div class="substep">
+      <p><strong>電話番号を認証します。</strong>携帯番号を入力 → SMSで届く6桁のコードを入力。</p>
+    </div>
+    <div class="substep">
+      <p><strong>利用規約に同意して完了。</strong>これで無料版の Claude が使えます。</p>
+    </div>
+  </div>
+
+  <h3 id="s2-2"><span class="sec-num">2.2</span> Pro プラン契約</h3>
+  <div class="info-box warn">
+    <strong>Cowork モードと Claude Code は、Pro プラン以上が必要です。</strong><br>
+    月額 $20（約3,000円）。Chat のみの利用でも、応答回数の上限が大幅に増えます。
+  </div>
+  <div class="steps">
+    <div class="substep">
+      <p><strong>以下のURLを開きます。</strong></p>
+      <div class="url-box">
+        <div class="label">アクセス先</div>
+        <a href="https://claude.ai/settings/billing" target="_blank">https://claude.ai/settings/billing</a>
+      </div>
+    </div>
+    <div class="substep">
+      <p><strong>「Upgrade to Pro」をクリック → カード情報を入力 → 「Subscribe」で完了。</strong></p>
+      <p>決済は米ドル（USD）です。日本のカードでも利用可能です。</p>
+    </div>
+  </div>
+
+  <div class="info-box tip">
+    <strong>同じアカウントを複数デバイスで使えます。</strong><br>
+    会社のPC、自宅のPC、スマホなど、どこからでもログインして利用できます。ただし利用量の上限はアカウント全体で共有されます。
+  </div>
+</div>
+
+<!-- ===== Chapter 3A ===== -->
+<div class="content page-break" id="ch3a">
+  <div class="chapter-badge all">全員が読む章</div>
+  <div class="chapter-heading">Chapter 3A</div>
+  <h2>Claude Desktop インストール</h2>
+
+  <p>Claude Desktop は、Chat と Cowork が使えるアプリです。<strong>全員がインストールしてください。</strong><br>
+  開発者の方も、まずこちらを完了してから 3B章 に進んでください。</p>
+
+  <h3 id="s3a-1"><span class="sec-num">3A.1</span> アプリのダウンロード</h3>
+  <div class="steps">
+    <div class="substep">
+      <p><strong>以下のURLを開いてください。</strong></p>
+      <div class="url-box">
+        <div class="label">ダウンロード</div>
+        <a href="https://claude.ai/download" target="_blank">https://claude.ai/download</a>
+      </div>
+    </div>
+    <div class="substep">
+      <p><strong>お使いのOSに合ったボタンをクリックしてダウンロードします。</strong></p>
+      <ul>
+        <li><strong>Mac:</strong> <code>.dmg</code> ファイルを開き、アプリケーションフォルダにドラッグ</li>
+        <li><strong>Windows:</strong> <code>.exe</code> ファイルを実行してインストール</li>
+      </ul>
+    </div>
+    <div class="substep">
+      <p><strong>アプリを起動します。</strong></p>
+      <p>Dock（Mac）またはスタートメニュー（Windows）から「Claude」を起動します。</p>
+    </div>
+  </div>
+
+  <h3 id="s3a-2"><span class="sec-num">3A.2</span> 初回ログイン</h3>
+  <div class="steps">
+    <div class="substep">
+      <p><strong>2章で作成したアカウントでログインします。</strong></p>
+      <p>Google アカウントで登録した場合は「Continue with Google」をクリック。</p>
+    </div>
+    <div class="substep">
+      <p><strong>ログイン完了後、Claude のチャット画面が表示されます。</strong></p>
+    </div>
+  </div>
+
+  <h3 id="s3a-3"><span class="sec-num">3A.3</span> Chat モードで動作確認</h3>
+  <div class="steps">
+    <div class="substep">
+      <p><strong>メッセージ入力欄に日本語で話しかけてみましょう。</strong></p>
+      <div class="code-block"><span class="prompt">&gt;</span> こんにちは。あなたは何ができますか？日本語で簡単に教えてください。</div>
+      <p>日本語で回答が返ってくれば正常動作です。</p>
+    </div>
+  </div>
+
+  <h3 id="s3a-4"><span class="sec-num">3A.4</span> Cowork モードを試す</h3>
+  <div class="info-box tip">
+    <strong>Cowork は Mac（Apple Silicon: M1以降）と Windows で利用可能です。</strong><br>
+    古い Mac（Intel）では利用できません。
+  </div>
+  <div class="steps">
+    <div class="substep">
+      <p><strong>Claude Desktop の画面上部で「Cowork」モードを選択します。</strong></p>
+      <p>Chat と Cowork の切り替えボタンが表示されています。</p>
+    </div>
+    <div class="substep">
+      <p><strong>簡単なタスクを試してみましょう。</strong></p>
+      <div class="code-block"><span class="prompt">&gt;</span> デスクトップに「テスト.txt」というファイルを作成して、「Claude導入テスト成功」と書いてください。</div>
+      <p>Claude が確認を求めたら「Allow」（許可）をクリック。デスクトップにファイルができれば成功です。</p>
+    </div>
+  </div>
+
+  <div class="info-box success">
+    <strong>3A章完了!</strong> Claude Desktop のインストールと動作確認ができました。<br>
+    ビジネスユーザーの方は 4章 へ進んでください。開発者の方は 3B章 へ。
+  </div>
+</div>
+
+<!-- ===== Chapter 3B ===== -->
+<div class="content page-break dev-only" id="ch3b">
+  <div class="chapter-badge dev">開発者のみ — ビジネスユーザーはスキップ → 4章へ</div>
+  <div class="chapter-heading">Chapter 3B</div>
+  <h2>Claude Code 有効化</h2>
+
+  <div class="info-box danger" style="font-size: 15px;">
+    <strong style="font-size: 16px;">この章は開発者（タイプB）だけが読みます。</strong><br>
+    ビジネスユーザー（タイプA）の方は、このページを飛ばして <strong><a href="#ch4">4章 Google Drive 導入</a></strong> に進んでください。
+  </div>
+
+  <p>Claude Code は、PCのファイルやフォルダを直接操作できるAIエージェントです。プログラム開発、ツール構築、自動化に使います。<br>
+  <strong>3A章でインストールした Claude Desktop の中に含まれています。</strong>追加インストールは不要です。</p>
+
+  <h3 id="s3b-1"><span class="sec-num">3B.1</span> Code タブの有効化</h3>
+  <div class="steps">
+    <div class="substep">
+      <p><strong>Claude Desktop を開きます。</strong></p>
+    </div>
+    <div class="substep">
+      <p><strong>設定画面を開きます。</strong></p>
+      <p><strong>Mac:</strong> メニューバー「Claude」→「Settings...」（または <code>Command + ,</code>）<br>
+      <strong>Windows:</strong> 左下の歯車アイコン → 「Settings」</p>
+    </div>
+    <div class="substep">
+      <p><strong>「Claude Code」の項目を見つけて、有効化（ON）にします。</strong></p>
+      <div class="info-box tip">
+        <strong>有効化すると、画面上部に「Code」タブが追加されます。</strong><br>
+        Chat / Cowork に加えて、Code タブからファイル操作やプログラム実行ができるようになります。
+      </div>
+    </div>
+  </div>
+
+  <h3 id="s3b-2"><span class="sec-num">3B.2</span> 動作確認テスト</h3>
+  <div class="steps">
+    <div class="substep">
+      <p><strong>「Code」タブをクリックして切り替えます。</strong></p>
+    </div>
+    <div class="substep">
+      <p><strong>日本語で話しかけてみましょう。</strong></p>
+      <div class="code-block"><span class="prompt">&gt;</span> こんにちは。今日の日付を教えてください。</div>
+      <p>日本語で日付が返ってくれば正常動作です。</p>
+    </div>
+    <div class="substep">
+      <p><strong>ファイル作成テスト:</strong></p>
+      <div class="code-block"><span class="prompt">&gt;</span> デスクトップに「テスト.txt」を作成して「Claude Code導入テスト成功」と書いてください。</div>
+      <p>Claude が「許可しますか？」と聞いてきたら「Allow」で進めてください。デスクトップにファイルができれば成功です。</p>
+    </div>
+  </div>
+
+  <h3 id="s3b-3"><span class="sec-num">3B.3</span> ターミナル版について（上級者向け）</h3>
+  <div class="info-box tip">
+    <strong>通常はDesktop内のCodeタブだけで十分です。</strong>以下のような高度な用途が必要になった場合のみ、ターミナル版（CLI）の追加インストールを検討してください。
+  </div>
+  <table>
+    <tr><th>用途</th><th>説明</th></tr>
+    <tr><td>スクリプト自動実行</td><td>定期的なバッチ処理をPCに任せたい場合</td></tr>
+    <tr><td>エージェントチーム</td><td>複数のAIインスタンスを連携させる場合</td></tr>
+    <tr><td>CI/CD連携</td><td>GitHubと連動した自動テスト・デプロイ</td></tr>
+  </table>
+  <p style="margin-top: 12px; font-size: 13px; color: var(--text-2);">ターミナル版が必要になったときは担当者（谷本）にご相談ください。</p>
+
+  <div class="info-box success">
+    <strong>3B章完了!</strong> Claude Code の有効化と動作確認ができました。4章へ進んでください。
+  </div>
+</div>
+
+<!-- ===== Chapter 4 ===== -->
+<div class="content page-break" id="ch4">
+  <div class="chapter-badge all">全員が読む章</div>
+  <div class="chapter-heading">Chapter 4</div>
+  <h2>Google Drive デスクトップ 導入</h2>
+
+  <p>Google Drive デスクトップアプリを入れると、クラウド上のファイルをPC上のフォルダとして扱えます。<br>
+  ここで作る Obsidian フォルダが、今後の Claude の作業場所になります。</p>
+
+  <div class="info-box tip">
+    <strong>なぜ Google Drive 上に作るの？</strong><br>
+    PCが壊れてもデータが失われません。複数デバイスからアクセスでき、同じ会社のメンバーとも安全にファイルを共有できます。
+  </div>
+
+  <h3 id="s4-1"><span class="sec-num">4.1</span> アプリのインストール</h3>
+  <div class="steps">
+    <div class="substep">
+      <p><strong>以下のURLを開いてください。</strong></p>
+      <div class="url-box">
+        <div class="label">ダウンロード</div>
+        <a href="https://www.google.com/drive/download/" target="_blank">https://www.google.com/drive/download/</a>
+      </div>
+    </div>
+    <div class="substep">
+      <p><strong>「パソコン版ドライブをダウンロード」をクリック。</strong></p>
+      <p>ダウンロードされたファイルを開いてインストールします。</p>
+      <ul>
+        <li><strong>Mac:</strong> <code>.dmg</code> ファイルを開き、アプリケーションフォルダにドラッグ</li>
+        <li><strong>Windows:</strong> <code>.exe</code> ファイルを実行してウィザードに従う</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 id="s4-2"><span class="sec-num">4.2</span> ログインと同期設定</h3>
+  <div class="steps">
+    <div class="substep">
+      <p><strong>アプリを起動し、Google アカウントでログインします。</strong></p>
+    </div>
+    <div class="substep">
+      <p><strong>同期設定はデフォルトのままでOK。</strong></p>
+      <p>設定完了後、以下の場所に Google Drive フォルダが現れます:</p>
+      <table>
+        <tr><th>OS</th><th>パス</th></tr>
+        <tr><td>Mac</td><td><code>~/Library/CloudStorage/GoogleDrive-（メールアドレス）/マイドライブ/</code></td></tr>
+        <tr><td>Windows</td><td><code>G:\マイドライブ\</code> またはエクスプローラーの「Google Drive」</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <h3 id="s4-3"><span class="sec-num">4.3</span> Obsidian Vault フォルダの作成</h3>
+
+  <div class="info-box tip">
+    <strong>Obsidian（オブシディアン）って何？</strong><br>
+    メモやドキュメントを管理する無料アプリです。次の5章で詳しく設定しますが、今はフォルダだけ作っておけばOKです。深く考えなくて大丈夫！
+  </div>
+
+  <div class="steps">
+    <div class="substep">
+      <p><strong>Google Drive の「マイドライブ」内に、新しいフォルダを作ります。</strong></p>
+      <ul>
+        <li><strong>方法A:</strong> Finder（Mac）/ エクスプローラー（Windows）で Google Drive フォルダを開き、右クリック → 新規フォルダ</li>
+        <li><strong>方法B:</strong> <a href="https://drive.google.com" target="_blank">drive.google.com</a> をブラウザで開き、「新規」→「フォルダ」</li>
+      </ul>
+    </div>
+    <div class="substep">
+      <p><strong>フォルダ名を <code>Obsidian_Vault</code> にします。</strong></p>
+      <div class="info-box tip">
+        <strong>これはただの普通のフォルダです。</strong>特別なアプリではありません。<br>
+        このフォルダの中に、Claudeが作るメモや資料が保存されていきます。名前は「Obsidian_Vault」で統一してください（後の設定で使います）。
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Chapter 5 ===== -->
+<div class="content page-break" id="ch5">
+  <div class="chapter-badge all">全員が読む章</div>
+  <div class="chapter-heading">Chapter 5</div>
+  <h2>Obsidian 導入と初期設定</h2>
+
+  <p>Obsidian は、マークダウン形式でノートを管理する無料アプリです。Claude が作成するドキュメントの閲覧・編集に使います。</p>
+
+  <h3 id="s5-1"><span class="sec-num">5.1</span> Obsidian のインストール</h3>
+  <div class="steps">
+    <div class="substep">
+      <p><strong>以下のURLを開いてダウンロードします。</strong></p>
+      <div class="url-box">
+        <div class="label">ダウンロード</div>
+        <a href="https://obsidian.md/download" target="_blank">https://obsidian.md/download</a>
+      </div>
+      <p>お使いのOSに合ったバージョンをダウンロードしてインストールしてください。</p>
+      <div class="info-box success">
+        <strong>Obsidian は完全無料で使えます。</strong>有料プランへの加入は不要です。
+      </div>
+    </div>
+  </div>
+
+  <h3 id="s5-2"><span class="sec-num">5.2</span> Vault（保管庫）の設定</h3>
+  <div class="steps">
+    <div class="substep">
+      <p><strong>Obsidian を起動します。</strong></p>
+    </div>
+    <div class="substep">
+      <p><strong>「Open folder as vault」（フォルダを保管庫として開く）を選択。</strong></p>
+    </div>
+    <div class="substep">
+      <p><strong>4.3 で作成した <code>Obsidian_Vault</code> フォルダを選択します。</strong></p>
+      <table>
+        <tr><th>Mac</th><td><code>~/Library/CloudStorage/GoogleDrive-.../マイドライブ/Obsidian_Vault</code></td></tr>
+        <tr><th>Windows</th><td><code>G:\マイドライブ\Obsidian_Vault</code></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <h3 id="s5-3"><span class="sec-num">5.3</span> フォルダ構成について</h3>
+  <p>Obsidian Vault 内は、以下のフォルダ構成でAIが自動で整理・管理・作成していきます。</p>
+  <div class="file-tree">Obsidian_Vault/
+├── 00_inbox/          ← 未整理・一時メモ
+├── 10_projects/       ← プロジェクト別フォルダ
+├── 20_areas/          ← 継続的な業務領域
+├── 30_resources/      ← 参考資料・ナレッジ
+├── 40_archive/        ← 完了・アーカイブ
+└── templates/         ← テンプレート</div>
+
+  <div class="info-box success">
+    <strong>手動で作る必要はありません！</strong>次の6章で Claude に初回セットアップを実行してもらうと、このフォルダ構成とテンプレートを<strong>自動で作成</strong>してくれます。ここでは「こういう構成になるんだな」と眺めるだけでOKです。
+  </div>
+
+  <div class="info-box success">
+    <strong>5章完了!</strong> Obsidian の環境が整いました。次章で Claude と連携させます。
+  </div>
+</div>
+
+<!-- ===== Chapter 6 ===== -->
+<div class="content page-break" id="ch6">
+  <div class="chapter-badge all">全員が読む章</div>
+  <div class="chapter-heading">Chapter 6</div>
+  <h2>Claude 初期設定</h2>
+
+  <p>Claude をあなたの業務環境に合わせてカスタマイズします。<br>
+  担当者（谷本）から受け取る<strong>「スターターキット」</strong>を使って設定します。</p>
+
+  <h3 id="s6-1"><span class="sec-num">6.1</span> スターターキットのダウンロード</h3>
+  <div class="steps">
+    <div class="substep">
+      <p><strong>担当者（谷本）から共有される GitHub のURLを開きます。</strong></p>
+      <div class="url-box">
+        <div class="label">ダウンロード先</div>
+        <a href="https://github.com/fleskingllc-bit/claude-starter-kit" target="_blank">https://github.com/fleskingllc-bit/claude-starter-kit</a>
+      </div>
+    </div>
+    <div class="substep">
+      <p><strong>緑色の「Code」ボタン →「Download ZIP」をクリックしてダウンロードします。</strong></p>
+      <p>ダウンロードフォルダに ZIP ファイルが保存されます。<strong>ダブルクリックで解凍</strong>してください。</p>
+    </div>
+  </div>
+
+  <div class="step-card highlight">
+    <p><strong>スターターキットには以下が含まれています:</strong></p>
+    <table>
+      <tr><th>ファイル</th><th>役割</th></tr>
+      <tr><td><code>CLAUDE.md</code></td><td>Claude への指示書（会社名・ルール等）</td></tr>
+      <tr><td><code>.claude/settings.json</code></td><td>権限設定ファイル</td></tr>
+      <tr><td><code>.claude/skills/wrap/</code></td><td>作業記録スキル（6.5で説明）</td></tr>
+      <tr><td><code>first-session-prompt.md</code></td><td>初回セットアップ用プロンプト</td></tr>
+    </table>
+  </div>
+
+  <div class="info-box success">
+    <strong>ファイルの配置は手動で行う必要はありません。</strong>次のステップで Claude が自動で正しい場所に配置してくれます。
+  </div>
+
+  <h3 id="s6-2"><span class="sec-num">6.2</span> CLAUDE.md とは</h3>
+  <p><code>CLAUDE.md</code> は、Claude に「あなたは誰で、何をしてほしいか」を伝える指示書です。<br>
+  ここに書いたルールを Claude は常に守ります。</p>
+
+  <div class="step-card">
+    <h4>CLAUDE.md に書かれている内容</h4>
+    <table>
+      <tr><th>項目</th><th>内容</th></tr>
+      <tr><td><strong>基本情報</strong></td><td>会社名、あなたの名前、役職、業種</td></tr>
+      <tr><td><strong>作業ルール</strong></td><td>日本語で回答、変更前に確認を取る、バックアップを取る</td></tr>
+      <tr><td><strong>提案ルール</strong></td><td>成功確度（高/中/低）を必ず付記、費用が発生する場合は事前明示</td></tr>
+      <tr><td><strong>禁止事項</strong></td><td>ファイル削除禁止（アーカイブのみ）、メール送信禁止（下書きまで）</td></tr>
+      <tr><td><strong>ファイル管理</strong></td><td>Obsidian Vault のパス、フォルダ構成のルール</td></tr>
+      <tr><td><strong>サポート連絡先</strong></td><td>谷本の連絡先</td></tr>
+    </table>
+  </div>
+
+  <div class="info-box tip">
+    <strong>CLAUDE.md は後からいつでも編集できます。</strong>使っていく中で「こうしてほしい」と思うことがあれば、Claude に「CLAUDE.md にこのルールを追加して」と伝えるだけです。
+  </div>
+
+  <h3 id="s6-3"><span class="sec-num">6.3</span> Claude に初期設定してもらう</h3>
+  <p>ここからが<strong>「Claude の魔法」</strong>です。プロンプトを1つ貼るだけで、Claude がすべてを自動で設定します。</p>
+
+  <div class="step-card highlight">
+    <h4>ビジネスユーザーの方</h4>
+    <p>Claude Desktop を開き、<strong>Cowork モード</strong>で実行してください。</p>
+  </div>
+
+  <div class="step-card">
+    <h4>開発者の方</h4>
+    <p>Claude Code（ターミナル）で実行してください。</p>
+  </div>
+
+  <div class="steps">
+    <div class="substep">
+      <p><strong>以下のプロンプトをすべてコピーして、Claude に貼り付けて送信します。</strong></p>
+      <div class="code-block" style="background: #1a2332; border: 2px solid var(--blue); font-size: 12.5px; line-height: 1.5; white-space: pre-wrap;">ダウンロードフォルダにスターターキット（starter-kit）があります。
+以下の手順で初期設定を行ってください。各ステップで何をするか説明してから実行してください。
+
+1. ダウンロードフォルダでスターターキットを見つけてください（starter-kit フォルダまたは ZIP を解凍したフォルダ）
+
+2. キット内のファイルを正しい場所に配置してください:
+   - CLAUDE.md → ホームフォルダ直下（~/CLAUDE.md）
+   - .claude/ フォルダ → ホームフォルダ直下（~/.claude/）
+     ※ 既に .claude/ が存在する場合は、中身をマージしてください（既存ファイルは上書きしない）
+
+3. ホームフォルダに配置した CLAUDE.md を読み込み、「基本情報」セクションの未入力項目を私に質問して埋めてください:
+   - 会社名
+   - 担当者（氏名）
+   - 役職
+   - 業種
+
+4. PCのクラウドストレージを自動検出してください:
+   - ~/Library/CloudStorage/ （Mac）または ~/OneDrive/ や ~/Google Drive/ を探す
+   - Google Drive、OneDrive、その他のクラウドストレージのどれが使われているか特定する
+   - 見つかったクラウドストレージ内に Obsidian_Vault フォルダがなければ作成する
+   - CLAUDE.md の「ファイル管理」セクションのパスを、検出したクラウドストレージのパスに自動修正する
+   - クラウドストレージが見つからない場合は、どのサービスを使っているか質問する
+
+5. Obsidian Vault 内に以下のフォルダ構成を作成してください（既にあればスキップ）:
+   - 00_inbox/
+   - 10_projects/
+   - 20_areas/
+   - 30_resources/
+   - 40_archive/
+   - templates/
+
+6. スターターキットの templates/ フォルダ内のテンプレートファイルを Obsidian Vault の templates/ にコピーしてください:
+   - meeting-note.md（会議メモ用）
+   - project-note.md（プロジェクトノート用）
+   - daily-note.md（日次メモ用）
+
+7. 設定内容を要約して報告してください</div>
+    </div>
+    <div class="substep">
+      <p><strong>Claude があなたに質問しながら、以下をすべて自動で行います:</strong></p>
+      <ul>
+        <li>ダウンロードフォルダからファイルを正しい場所に配置</li>
+        <li>CLAUDE.md の基本情報（会社名・名前・役職・業種）をヒアリングして入力</li>
+        <li>権限設定ファイルの配置</li>
+        <li>クラウドストレージ（Google Drive / OneDrive 等）を自動検出</li>
+        <li>Obsidian Vault フォルダの確認・作成、パスを自動設定</li>
+        <li>Obsidian Vault 内のフォルダ構成を自動作成（5.3 で紹介した構成）</li>
+        <li>テンプレートファイル（会議メモ、プロジェクトノート、日次メモ）を自動作成</li>
+        <li>設定結果の要約レポート</li>
+      </ul>
+    </div>
+    <div class="substep">
+      <p><strong>Claude の質問に答えていくだけで、すべての初期設定が完了します。</strong></p>
+      <div class="info-box tip">
+        <strong>Claude が「許可しますか？」と聞いてきたら「はい」（Allow）で進めてください。</strong><br>
+        ファイルの配置や作成のたびに確認を求めてきます。内容を確認して許可してください。
+      </div>
+    </div>
+  </div>
+
+  <h3 id="s6-4"><span class="sec-num">6.4</span> 設定内容の確認</h3>
+  <p>Claude が初期設定を完了すると、以下が自動で配置・作成されています:</p>
+  <div class="step-card">
+    <table>
+      <tr><th>項目</th><th>場所</th><th>内容</th></tr>
+      <tr><td>CLAUDE.md</td><td>ホームフォルダ直下</td><td>あなたの情報が入力済みの指示書</td></tr>
+      <tr><td>.claude/settings.json</td><td>ホームフォルダ直下</td><td>安全な権限設定</td></tr>
+      <tr><td>.claude/skills/wrap/</td><td>ホームフォルダ直下</td><td>作業記録スキル</td></tr>
+      <tr><td>フォルダ構成</td><td>Obsidian Vault 内</td><td>00_inbox〜40_archive, templates</td></tr>
+      <tr><td>テンプレート</td><td>Obsidian Vault/templates/</td><td>会議メモ、プロジェクトノート、日次メモ</td></tr>
+    </table>
+  </div>
+
+  <div class="info-box tip">
+    <strong>権限設定について:</strong>Claude はファイルの読み取りと検索は自由にできますが、<strong>書き込みやコマンド実行は毎回あなたの許可を求めます</strong>。安全な初期設定です。使い慣れたら設定を緩めることもできます。
+  </div>
+
+  <h3 id="s6-5"><span class="sec-num">6.5</span> 便利な機能:「/wrap」で作業記録</h3>
+  <p>スターターキットには <strong>/wrap</strong> という便利な機能（スキル）が含まれています。</p>
+
+  <div class="step-card highlight">
+    <h4>/wrap とは？</h4>
+    <p>Claude との作業が終わったときに <code>/wrap</code> と入力するだけで、<strong>今回のセッションで何をしたかを自動的にまとめて Obsidian に保存</strong>してくれます。</p>
+    <p style="margin-top: 10px;">手書きの作業メモが不要になります。後から「あのとき何をやったっけ？」と振り返るのに便利です。</p>
+    <p style="margin-top: 10px; font-weight: 700;">かならず、ひとまとまりの作業が終わったら実行して、AIの長期記憶を作りましょう！</p>
+  </div>
+
+  <h4>使い方</h4>
+  <div class="steps">
+    <div class="substep">
+      <p><strong>Claude との作業がひと区切りついたら、以下を入力します。</strong></p>
+      <div class="code-block"><span class="prompt">&gt;</span> /wrap</div>
+    </div>
+    <div class="substep">
+      <p><strong>Claude が自動で以下を行います:</strong></p>
+      <ul>
+        <li>今回のセッションで何をしたかを振り返る</li>
+        <li>作業内容・変更点・今後の予定を整理する</li>
+        <li>Obsidian Vault 内に作業ノートとして保存する</li>
+      </ul>
+    </div>
+    <div class="substep">
+      <p><strong>保存されたノートを Obsidian で確認できます。</strong></p>
+    </div>
+  </div>
+
+  <h4>保存されるノートの例</h4>
+  <div class="code-block"><span class="comment"># Slack Bot 初期設定</span>
+
+作業日: 2026-03-15
+
+<span class="comment">## 概要</span>
+社内連絡用の Slack Bot を作成し、
+基本的なメッセージ応答機能を実装した。
+
+<span class="comment">## 作業内容</span>
+...
+
+<span class="comment">## 今後の予定</span>
+- 議事録自動生成機能の追加
+- スケジュール通知の設定</div>
+
+  <div class="info-box tip">
+    <strong>毎回の作業の最後に <code>/wrap</code> を習慣にしましょう。</strong><br>
+    チームメンバーが Obsidian を開けば、誰がいつ何をしたかが一目でわかります。
+  </div>
+
+  <div class="info-box success">
+    <strong>6章完了! すべての初期設定が完了しました。</strong><br>
+    Claude はあなたの業務環境を理解し、すぐに活用できる状態です。
+  </div>
+</div>
+
+<!-- ===== Chapter 7 ===== -->
+<div class="content page-break" id="ch7">
+  <div class="chapter-heading">Chapter 7</div>
+  <h2>トラブルシューティング</h2>
+
+  <h3 id="s7-1"><span class="sec-num">7.1</span> よくある問題と解決法</h3>
+
+  <div class="step-card">
+    <h4>7.1.1 Claude Desktop が起動しない</h4>
+    <table>
+      <tr><th>症状</th><th>対処法</th></tr>
+      <tr><td>アプリが開かない</td><td>PCを再起動してから再度試す</td></tr>
+      <tr><td>ログイン画面が出ない</td><td>アプリを削除して再インストール（4A.1）</td></tr>
+      <tr><td>Cowork が選べない</td><td>Mac: Apple Silicon（M1以降）が必要。左上  → このMacについて で確認</td></tr>
+    </table>
+  </div>
+
+  <div class="step-card">
+    <h4>7.1.2 Claude Code のインストールでエラーが出る（開発者向け）</h4>
+    <table>
+      <tr><th>症状</th><th>対処法</th></tr>
+      <tr><td>「command not found: curl」</td><td>Mac: ターミナルで <code>xcode-select --install</code> を実行</td></tr>
+      <tr><td>「Permission denied」</td><td>管理者権限がない可能性。IT部門に確認。</td></tr>
+      <tr><td>ネットワークエラー</td><td>Wi-Fiを確認。VPN を使用中なら一時的にOFFに。</td></tr>
+    </table>
+  </div>
+
+  <div class="step-card">
+    <h4>7.1.3 <code>claude</code> コマンドが見つからない（開発者向け）</h4>
+    <p>ターミナル / PowerShell を<strong>一度閉じて再度開いてください。</strong><br>
+    それでも解決しない場合:</p>
+    <div class="code-block"><span class="comment"># Mac</span>
+<span class="prompt">$</span> ls ~/.local/bin/claude
+
+<span class="comment"># Windows</span>
+<span class="prompt">PS&gt;</span> ls $env:USERPROFILE\.local\bin\claude.exe</div>
+  </div>
+
+  <div class="step-card">
+    <h4>7.1.4 「Pro plan required」と表示される</h4>
+    <p>セクション 2.2 に戻って Pro プランを契約してください。</p>
+  </div>
+
+  <div class="step-card">
+    <h4>7.1.5 Google Drive が同期されない</h4>
+    <p>タスクバー / メニューバーの Google Drive アイコンをクリックして同期状態を確認。<br>
+    「一時停止」になっていたら再開してください。</p>
+  </div>
+
+  <div class="step-card">
+    <h4>7.1.6 Obsidian でファイルが見えない</h4>
+    <p>Google Drive の同期が追いついていない可能性があります。数分待ってから Obsidian を再起動してください。</p>
+  </div>
+
+  <h3 id="s7-2"><span class="sec-num">7.2</span> 診断コマンド</h3>
+  <p>解決しない場合は、以下の情報をスクリーンショットで撮ってサポートに送ってください。</p>
+  <div class="step-card">
+    <h4>Claude Desktop の場合</h4>
+    <p>アプリ内の設定画面 → 「About」のバージョン情報をスクリーンショット</p>
+  </div>
+  <div class="step-card">
+    <h4>Claude Code の場合（開発者向け）</h4>
+    <div class="code-block"><span class="prompt">$</span> claude doctor</div>
+  </div>
+</div>
+
+<!-- ===== Chapter 8 ===== -->
+<div class="content page-break" id="ch8">
+  <div class="chapter-heading">Chapter 8</div>
+  <h2>ヘルプ・サポート</h2>
+
+  <h3 id="s8-1"><span class="sec-num">8.1</span> つまづいたときの連絡方法</h3>
+
+  <div class="step-card highlight">
+    <h4>以下の3点を添えてご連絡ください</h4>
+    <ul class="checklist">
+      <li><strong>セクション番号</strong>（例: 「3A.2 の手順2で止まっています」）</li>
+      <li><strong>スクリーンショット</strong>（エラー画面や表示されている内容）</li>
+      <li><strong>PC情報</strong>（Mac / Windows、バージョン）</li>
+    </ul>
+
+    <div class="info-box tip" style="margin-top: 16px;">
+      <strong>スクリーンショットの撮り方:</strong><br>
+      <strong>Mac:</strong> <code>Command + Shift + 3</code>（全画面）/ <code>Command + Shift + 4</code>（範囲）<br>
+      <strong>Windows:</strong> <code>Windows + Shift + S</code>（範囲選択）/ <code>Print Screen</code>
+    </div>
+
+    <h4>連絡先</h4>
+    <table>
+      <tr><th>方法</th><th>宛先</th></tr>
+      <tr><td>メール</td><td><strong>flesking.llc@gmail.com</strong></td></tr>
+      <tr><td>電話</td><td><strong>090-5502-2097</strong>（谷本）</td></tr>
+    </table>
+  </div>
+
+  <h3 id="s8-2"><span class="sec-num">8.2</span> 参考リンク</h3>
+  <table>
+    <tr><th>リソース</th><th>URL</th></tr>
+    <tr><td>Claude 公式サイト</td><td><a href="https://claude.ai">https://claude.ai</a></td></tr>
+    <tr><td>Claude Desktop ダウンロード</td><td><a href="https://claude.ai/download">https://claude.ai/download</a></td></tr>
+    <tr><td>料金プラン</td><td><a href="https://claude.com/pricing">https://claude.com/pricing</a></td></tr>
+    <tr><td>Obsidian 公式</td><td><a href="https://obsidian.md">https://obsidian.md</a></td></tr>
+    <tr><td>Google Drive ダウンロード</td><td><a href="https://www.google.com/drive/download/">https://www.google.com/drive/download/</a></td></tr>
+  </table>
+</div>
+
+<!-- ===== 完了チェックリスト ===== -->
+<div class="content">
+  <h2>導入完了チェックリスト</h2>
+
+  <h4>全員</h4>
+  <ul class="checklist">
+    <li>[2.1] Claude アカウントを作成した</li>
+    <li>[2.2] Pro プランに加入した</li>
+    <li>[3A.1] Claude Desktop をインストールした</li>
+    <li>[3A.3] Chat モードで動作確認した</li>
+    <li>[3A.4] Cowork モードで動作確認した</li>
+    <li>[4.1] Google Drive デスクトップをインストールした</li>
+    <li>[4.3] Obsidian_Vault フォルダを作成した</li>
+    <li>[5.1] Obsidian をインストールした</li>
+    <li>[5.2] Vault を設定した</li>
+    <li>[6.3] CLAUDE.md を配置・編集した</li>
+    <li>[6.4] パーミッション設定を配置した</li>
+    <li>[6.5] 初回セットアッププロンプトを実行した</li>
+    <li>[6.6] /wrap を試して作業記録を確認した</li>
+  </ul>
+
+  <h4>開発者のみ</h4>
+  <ul class="checklist">
+    <li>[3B.1/3B.2] Claude Code をインストールした</li>
+    <li>[3B.3] ブラウザで認証を完了した</li>
+    <li>[3B.4] Claude Code で動作確認した</li>
+  </ul>
+
+  <div class="info-box success" style="text-align: center; margin-top: 24px;">
+    <strong style="font-size: 18px;">導入完了おめでとうございます!</strong><br><br>
+    次回のサポートセッションで、<br>実際の業務課題を Claude で解決する方法をご案内します。
+  </div>
+
+  <div class="footer">
+    <p>Claude 導入マニュアル v3.0 | 2026年3月</p>
+    <p>作成: 谷本幹人 | flesking.llc@gmail.com | 090-5502-2097</p>
+    <p style="margin-top: 6px; font-size: 11px;">
+      本マニュアルの料金・仕様は2026年3月時点の情報です。最新情報は公式サイトをご確認ください。
+    </p>
+  </div>
+</div>
+
+</body>
+</html>
