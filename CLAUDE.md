@@ -45,6 +45,4 @@ Obsidian_Vault/
 
 # サポート連絡先
 
-- 担当: 谷本幹人
-- メール: flesking.llc@gmail.com
-- 電話: 090-5502-2097
+- Discord: https://discord.gg/g2YtZh2t
