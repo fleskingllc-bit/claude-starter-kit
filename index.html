@@ -1304,74 +1304,48 @@
     メールで届いたZIPファイルを使って、あなたの会社専用の環境を構築します。
   </div>
 
-  <h3 id="s9-1"><span class="sec-num">9.1</span> ZIPファイルの展開と配置</h3>
+  <h3 id="s9-1"><span class="sec-num">9.1</span> ZIPファイルの展開</h3>
 
   <div class="step-card">
-    <h4>Step 1: ZIPファイルを探す</h4>
+    <h4>Step 1: ZIPファイルをダウンロード</h4>
     <p>メールに添付された <code>hikari-ai-setup_○○会社.zip</code> をダウンロードしてください。<br>
     通常は <strong>ダウンロード</strong> フォルダに保存されます。</p>
   </div>
 
   <div class="step-card">
-    <h4>Step 2: 展開する</h4>
-    <p>ZIPファイルをダブルクリックして展開します。</p>
+    <h4>Step 2: ダブルクリックで展開</h4>
+    <p>ZIPファイルをダブルクリックするとフォルダが展開されます。<strong>それだけでOKです。</strong></p>
     <p>中に以下のファイルが入っています:</p>
     <div class="file-tree">CLAUDE.md          ← あなたの会社専用の設定ファイル
 onboarding.md      ← 導入チェックリスト（AIが案内役）
-commands/          ← スキルファイル
-  ├── wrap.md      ← セッション記録
-  ├── organize.md  ← フォルダ整理
-  └── research.md  ← リサーチ
-plans/             ← 業務構築計画書（選択した項目のみ）
-  ├── sales_plan.md
-  ├── minutes_plan.md
-  └── ...</div>
+commands/          ← スキルファイル（Claude が自動で配置します）
+plans/             ← 業務構築計画書（選択した項目のみ）</div>
+    <div class="info-box tip">
+      フォルダの移動やコピーは不要です。展開した場所でそのまま使えます。
+    </div>
   </div>
 
-  <div class="step-card">
-    <h4>Step 3: Projects フォルダに移動</h4>
-    <p><strong>Mac の場合:</strong></p>
-    <p>Finder を開き、ホームフォルダ（家のアイコン）に <code>Projects</code> フォルダを作成。<br>
-    展開したファイルを <strong>すべて</strong> <code>Projects</code> フォルダの中にコピーします。</p>
-    <div class="code-block">~/Projects/
-├── CLAUDE.md
-├── onboarding.md
-├── commands/
-└── plans/</div>
-
-    <p><strong>Windows の場合:</strong></p>
-    <p>エクスプローラーで <code>C:\Users\あなたのユーザー名</code> を開き、<code>Projects</code> フォルダを作成。<br>
-    同じように展開したファイルをすべてコピーします。</p>
-  </div>
-
-  <div class="step-card">
-    <h4>Step 4: スキルファイルを配置</h4>
-    <p><strong>Mac の場合:</strong> ターミナルを開いて以下を実行:</p>
-    <div class="code-block">mkdir -p ~/.claude/commands
-cp ~/Projects/commands/*.md ~/.claude/commands/</div>
-    <p><strong>Windows の場合:</strong> PowerShell を開いて以下を実行:</p>
-    <div class="code-block">mkdir -Force "$env:USERPROFILE\.claude\commands"
-Copy-Item "$env:USERPROFILE\Projects\commands\*.md" "$env:USERPROFILE\.claude\commands\"</div>
-  </div>
-
-  <h3 id="s9-2"><span class="sec-num">9.2</span> Claude Code を起動する</h3>
+  <h3 id="s9-2"><span class="sec-num">9.2</span> Claude Desktop で開く</h3>
 
   <div class="step-card highlight">
-    <h4>Step 5: Projects フォルダで起動</h4>
-    <p><strong>Mac の場合:</strong> ターミナルで以下を実行:</p>
-    <div class="code-block">cd ~/Projects
-claude</div>
-    <p><strong>Windows の場合:</strong> PowerShell で以下を実行:</p>
-    <div class="code-block">cd $env:USERPROFILE\Projects
-claude</div>
-    <p>Claude Code が起動すると、入力待ちの画面が表示されます。</p>
+    <h4>Step 3: Claude Desktop アプリを開く</h4>
+    <p>Chapter 3A でインストールした Claude Desktop アプリを起動します。</p>
   </div>
 
   <div class="step-card highlight">
-    <h4>Step 6: オンボーディングを開始</h4>
-    <p>Claude Code に以下のように入力してください:</p>
+    <h4>Step 4: 展開したフォルダをプロジェクトとして開く</h4>
+    <p>Claude Desktop の画面で、展開したフォルダ（<code>hikari-ai-setup_○○会社</code>）をプロジェクトとして開きます。</p>
+    <div class="info-box tip">
+      <strong>開き方:</strong> Claude Desktop の左メニュー → プロジェクト → フォルダを追加 → 展開したフォルダを選択
+    </div>
+  </div>
+
+  <div class="step-card highlight">
+    <h4>Step 5: オンボーディングを開始</h4>
+    <p>Claude に以下のように入力してください:</p>
     <div class="code-block" style="font-size: 16px; font-weight: 700; color: var(--accent);">onboarding.md を読んで、次のステップを教えて</div>
     <p>Claude が <code>onboarding.md</code> を読み、あなたの導入状況に合わせて次にやるべきことを案内してくれます。</p>
+    <p><strong>スキルファイルの配置なども Claude が自動で行います。</strong>ターミナル操作は不要です。</p>
     <p>以降は Claude の指示に従って進めるだけです。</p>
   </div>
 
