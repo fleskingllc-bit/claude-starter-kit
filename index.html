@@ -426,6 +426,13 @@
           <li><a href="#s8-2">参考リンク</a></li>
         </ol>
       </li>
+      <li><a href="#ch9">光AIプロジェクト — 初回起動ガイド</a>
+        <ol>
+          <li><a href="#s9-1">ZIPファイルの展開と配置</a></li>
+          <li><a href="#s9-2">Claude Code を起動する</a></li>
+          <li><a href="#s9-3">業務構築の始め方</a></li>
+        </ol>
+      </li>
     </ol>
   </div>
 </div>
@@ -1285,6 +1292,105 @@
     <tr><td>Obsidian 公式</td><td><a href="https://obsidian.md">https://obsidian.md</a></td></tr>
     <tr><td>Google Drive ダウンロード</td><td><a href="https://www.google.com/drive/download/">https://www.google.com/drive/download/</a></td></tr>
   </table>
+</div>
+
+<!-- ===== Chapter 9: 光AIプロジェクト オンボーディング ===== -->
+<div class="content page-break" id="ch9">
+  <div class="chapter-heading">Chapter 9</div>
+  <h2>光AIプロジェクト — 初回起動ガイド</h2>
+
+  <div class="info-box tip">
+    <strong>このチャプターは光AIプロジェクト参加者向けです。</strong><br>
+    申込後にメールで届いたZIPファイルを使って、あなたの会社専用の環境を構築します。
+  </div>
+
+  <h3 id="s9-1"><span class="sec-num">9.1</span> ZIPファイルの展開と配置</h3>
+
+  <div class="step-card">
+    <h4>Step 1: ZIPファイルを探す</h4>
+    <p>メールに添付された <code>hikari-ai-setup_○○会社.zip</code> をダウンロードしてください。<br>
+    通常は <strong>ダウンロード</strong> フォルダに保存されます。</p>
+  </div>
+
+  <div class="step-card">
+    <h4>Step 2: 展開する</h4>
+    <p>ZIPファイルをダブルクリックして展開します。</p>
+    <p>中に以下のファイルが入っています:</p>
+    <div class="file-tree">CLAUDE.md          ← あなたの会社専用の設定ファイル
+onboarding.md      ← 導入チェックリスト（AIが案内役）
+commands/          ← スキルファイル
+  ├── wrap.md      ← セッション記録
+  ├── organize.md  ← フォルダ整理
+  └── research.md  ← リサーチ
+plans/             ← 業務構築計画書（選択した項目のみ）
+  ├── sales_plan.md
+  ├── minutes_plan.md
+  └── ...</div>
+  </div>
+
+  <div class="step-card">
+    <h4>Step 3: Projects フォルダに移動</h4>
+    <p><strong>Mac の場合:</strong></p>
+    <p>Finder を開き、ホームフォルダ（家のアイコン）に <code>Projects</code> フォルダを作成。<br>
+    展開したファイルを <strong>すべて</strong> <code>Projects</code> フォルダの中にコピーします。</p>
+    <div class="code-block">~/Projects/
+├── CLAUDE.md
+├── onboarding.md
+├── commands/
+└── plans/</div>
+
+    <p><strong>Windows の場合:</strong></p>
+    <p>エクスプローラーで <code>C:\Users\あなたのユーザー名</code> を開き、<code>Projects</code> フォルダを作成。<br>
+    同じように展開したファイルをすべてコピーします。</p>
+  </div>
+
+  <div class="step-card">
+    <h4>Step 4: スキルファイルを配置</h4>
+    <p><strong>Mac の場合:</strong> ターミナルを開いて以下を実行:</p>
+    <div class="code-block">mkdir -p ~/.claude/commands
+cp ~/Projects/commands/*.md ~/.claude/commands/</div>
+    <p><strong>Windows の場合:</strong> PowerShell を開いて以下を実行:</p>
+    <div class="code-block">mkdir -Force "$env:USERPROFILE\.claude\commands"
+Copy-Item "$env:USERPROFILE\Projects\commands\*.md" "$env:USERPROFILE\.claude\commands\"</div>
+  </div>
+
+  <h3 id="s9-2"><span class="sec-num">9.2</span> Claude Code を起動する</h3>
+
+  <div class="step-card highlight">
+    <h4>Step 5: Projects フォルダで起動</h4>
+    <p><strong>Mac の場合:</strong> ターミナルで以下を実行:</p>
+    <div class="code-block">cd ~/Projects
+claude</div>
+    <p><strong>Windows の場合:</strong> PowerShell で以下を実行:</p>
+    <div class="code-block">cd $env:USERPROFILE\Projects
+claude</div>
+    <p>Claude Code が起動すると、入力待ちの画面が表示されます。</p>
+  </div>
+
+  <div class="step-card highlight">
+    <h4>Step 6: オンボーディングを開始</h4>
+    <p>Claude Code に以下のように入力してください:</p>
+    <div class="code-block" style="font-size: 16px; font-weight: 700; color: var(--accent);">onboarding.md を読んで、次のステップを教えて</div>
+    <p>Claude が <code>onboarding.md</code> を読み、あなたの導入状況に合わせて次にやるべきことを案内してくれます。</p>
+    <p>以降は Claude の指示に従って進めるだけです。</p>
+  </div>
+
+  <h3 id="s9-3"><span class="sec-num">9.3</span> 業務構築の始め方</h3>
+  <p>オンボーディングが Phase 4 まで進むと、<code>plans/</code> フォルダ内の構築計画書を使う段階になります。</p>
+
+  <div class="step-card">
+    <h4>構築計画書の使い方</h4>
+    <p>例えば売上管理を構築したい場合:</p>
+    <div class="code-block" style="font-size: 15px; color: var(--accent);">plans/sales_plan.md を読んで、これを元に構築を始めて</div>
+    <p>Claude があなたに質問しながら、最適な仕組みを一緒に作っていきます。<br>
+    事前準備は不要です。Claude が必要な情報をヒアリングします。</p>
+  </div>
+
+  <div class="info-box success">
+    <strong>困ったときは</strong><br>
+    Discord コミュニティでお気軽にご質問ください。<br>
+    <a href="https://discord.gg/g2YtZh2t">https://discord.gg/g2YtZh2t</a>
+  </div>
 </div>
 
 <!-- ===== 完了チェックリスト ===== -->
