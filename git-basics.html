@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Git・GitHub入門 — Claude Code時代の開発基礎知識</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #FFFFFF;
+    --bg-warm: #FAF7F5;
+    --bg-card: #F5F5F7;
+    --bg-card-warm: #F7F2EB;
+    --accent: #E68C38;
+    --accent-dark: #B86B24;
+    --accent-soft: #F2D19E;
+    --blue: #0071E3;
+    --text: #1D1D1F;
+    --text-2: #6E6E73;
+    --text-3: #99999E;
+    --border: #E5E7EB;
+    --green: #34C759;
+    --red: #FF3B30;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans JP', -apple-system, sans-serif;
+    color: var(--text);
+    line-height: 2.0;
+    background: var(--bg);
+    font-size: 15px;
+  }
+
+  @media print {
+    body { font-size: 10.5pt; }
+    .cover { min-height: auto; padding: 40px; }
+    .no-print { display: none; }
+    .step-card, .info-box, .qa-block { break-inside: avoid; }
+  }
+
+  /* Cover */
+  .cover {
+    background: var(--bg);
+    min-height: 70vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 60px 80px;
+    border-top: 6px solid var(--accent);
+  }
+  .cover h1 { font-size: 38px; font-weight: 900; color: var(--text); line-height: 1.3; }
+  .cover .subtitle { font-size: 17px; color: var(--text-2); margin-top: 12px; line-height: 1.7; }
+  .cover .divider { width: 80px; height: 3px; background: var(--accent); margin: 30px 0; }
+  .cover .meta { font-size: 14px; color: var(--text-2); }
+  .cover .badge {
+    display: inline-block;
+    background: var(--bg-card-warm);
+    color: var(--accent-dark);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 16px;
+  }
+
+  /* Back link */
+  .back-link {
+    position: absolute;
+    top: 24px;
+    left: 40px;
+    font-size: 13px;
+    color: var(--text-2);
+    text-decoration: none;
+  }
+  .back-link:hover { color: var(--accent); }
+
+  /* Content */
+  .content { max-width: 780px; margin: 0 auto; padding: 60px 40px; }
+
+  /* Chapter heading */
+  .chapter-heading {
+    font-size: 12px; font-weight: 700; color: var(--accent);
+    text-transform: uppercase; letter-spacing: 2px;
+    margin-bottom: 4px;
+  }
+  h2 {
+    font-size: 26px; font-weight: 700; color: var(--text);
+    margin-bottom: 16px; padding-bottom: 12px;
+    border-bottom: 2px solid var(--accent-soft);
+  }
+  h3 { font-size: 18px; font-weight: 700; color: var(--text); margin-top: 36px; margin-bottom: 14px; }
+  p { margin-bottom: 18px; font-size: 15px; }
+
+  /* TOC */
+  .toc { background: var(--bg-card); border-radius: 12px; padding: 24px 28px; margin: 20px 0 36px; }
+  .toc h3 { margin-top: 0; font-size: 17px; }
+  .toc ol { padding-left: 0; margin: 10px 0 0; list-style: none; counter-reset: toc; }
+  .toc > ol > li { counter-increment: toc; padding: 8px 0; font-size: 14.5px; font-weight: 600; }
+  .toc > ol > li::before { content: counter(toc) "."; color: var(--accent); font-weight: 700; margin-right: 8px; }
+  .toc a { color: var(--text); text-decoration: none; }
+  .toc a:hover { color: var(--accent); }
+
+  /* Q&A block */
+  .qa-block { margin: 40px 0; }
+
+  .question {
+    background: var(--bg-card);
+    border-radius: 12px;
+    padding: 22px 28px;
+    margin-bottom: 20px;
+    border-left: 4px solid var(--accent);
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.9;
+    color: var(--text);
+  }
+  .question .q-label {
+    display: inline-block;
+    background: var(--accent);
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-right: 8px;
+    vertical-align: middle;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .answer { padding-left: 8px; margin-bottom: 40px; }
+  .answer p { font-size: 15px; line-height: 2.0; }
+
+  /* Highlight box (for key takeaways) */
+  .highlight-box {
+    background: var(--bg-card-warm);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin: 20px 0;
+    font-size: 15px;
+    font-weight: 500;
+    border-left: 4px solid var(--accent-dark);
+    line-height: 1.9;
+  }
+
+  /* Code block */
+  .code-block {
+    background: #1D1D1F;
+    color: #E8E8E8;
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin: 16px 0 24px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13.5px;
+    line-height: 1.8;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .code-block .comment { color: #6A737D; }
+  .code-block .accent { color: var(--accent); }
+  .code-block .label {
+    position: relative;
+    float: right;
+    font-size: 10px;
+    color: var(--text-3);
+    font-family: 'Noto Sans JP', sans-serif;
+  }
+
+  /* Table */
+  table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px; }
+  th { background: var(--bg-card); color: var(--text); padding: 12px 16px; text-align: left; font-weight: 600; border-bottom: 2px solid var(--border); }
+  td { padding: 12px 16px; border-bottom: 1px solid var(--border); line-height: 1.7; }
+  td:first-child { white-space: nowrap; }
+
+  /* Inline code */
+  code {
+    background: var(--bg-card);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    padding: 2px 7px;
+    border-radius: 5px;
+    color: var(--accent-dark);
+  }
+
+  /* Lists */
+  ul, ol { margin: 14px 0 20px 20px; font-size: 15px; }
+  li { margin-bottom: 10px; line-height: 1.9; }
+
+  /* Flow diagram */
+  .flow-diagram {
+    background: var(--bg-card);
+    border-radius: 12px;
+    padding: 32px 24px;
+    margin: 24px 0;
+    text-align: center;
+  }
+  .flow-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin: 6px 0;
+  }
+  .flow-box {
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .flow-box.local { background: #E8F0FE; color: #1967D2; }
+  .flow-box.github { background: #1D1D1F; color: #E8E8E8; }
+  .flow-box.server { background: var(--bg-card-warm); color: var(--accent-dark); }
+  .flow-box.user { background: #E6F4EA; color: #137333; }
+  .flow-arrow { color: var(--text-3); font-size: 16px; }
+
+  /* Section divider */
+  .section-divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 70px 0;
+  }
+
+  /* Summary card */
+  .summary-card {
+    background: var(--bg-card);
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin: 20px 0;
+  }
+  .summary-card h3 { margin-top: 0; }
+
+  /* Comparison: OK vs NG */
+  .compare-row {
+    display: flex;
+    gap: 16px;
+    margin: 14px 0;
+  }
+  .compare-box {
+    flex: 1;
+    border-radius: 10px;
+    padding: 20px 22px;
+    font-size: 14px;
+    line-height: 1.9;
+  }
+  .compare-box.ok { background: #F0FDF4; border: 1px solid #BBF7D0; }
+  .compare-box.ng { background: #FEF2F2; border: 1px solid #FECACA; }
+  .compare-box .label { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
+  .compare-box.ok .label { color: var(--green); }
+  .compare-box.ng .label { color: var(--red); }
+
+  /* Footer */
+  .footer {
+    text-align: center; padding: 36px;
+    font-size: 12px; color: var(--text-3);
+    border-top: 1px solid var(--border); margin-top: 50px;
+  }
+  .footer a { color: var(--accent); text-decoration: none; }
+
+  @media (max-width: 600px) {
+    .cover { padding: 40px 24px; min-height: 60vh; }
+    .cover h1 { font-size: 28px; }
+    .content { padding: 30px 20px; }
+    .compare-row { flex-direction: column; }
+    .back-link { position: static; display: block; padding: 16px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Cover -->
+<div class="cover" style="position: relative;">
+  <a href="./" class="back-link no-print">← 導入マニュアルに戻る</a>
+  <div class="badge">対話形式で学ぶ</div>
+  <h1>Git・GitHub入門<br>Claude Code時代の開発基礎知識</h1>
+  <p class="subtitle">非エンジニアがAIコーディングツールを使い始めたときに必ずぶつかる疑問を、<br>対話形式でまとめました。</p>
+  <div class="divider"></div>
+  <div class="meta">
+    <div>2026年3月 — AIコーディングツールとの対話から生まれた講義ノート</div>
+  </div>
+</div>
+
+<!-- TOC -->
+<div class="content">
+  <div class="toc">
+    <h3>目次</h3>
+    <ol>
+      <li><a href="#ch1">ローカルにプロジェクトが溜まる問題</a></li>
+      <li><a href="#ch2">ビルドとデプロイ — コードはどこで動いているのか</a></li>
+      <li><a href="#ch3">Git操作の基本 — commit / push / pull</a></li>
+      <li><a href="#ch4">プルリクエストとコンフリクト</a></li>
+      <li><a href="#ch5">複数人での開発とデータベース</a></li>
+      <li><a href="#ch6">.envファイルと秘密情報の管理</a></li>
+      <li><a href="#ch7">launchdとは</a></li>
+      <li><a href="#summary">まとめ：全体の関係図</a></li>
+    </ol>
+  </div>
+
+  <!-- Chapter 1 -->
+  <hr class="section-divider">
+  <div class="chapter-heading" id="ch1">Chapter 1</div>
+  <h2>ローカルにプロジェクトが溜まる問題</h2>
+
+  <div class="qa-block">
+    <div class="question">
+      <span class="q-label">Q</span>
+      Claude Codeを使っていたら、Macのホームディレクトリにプロジェクトフォルダが30個近く溜まってきたんだけど。これ、みんなどうしてるの？
+    </div>
+    <div class="answer">
+      <p>これ、Claude Codeに限らず、AIコーディングツール（Cursor、Copilot等）を使う人が<strong>全員ぶつかる課題</strong>です。</p>
+      <p>調べてみると、コミュニティの共通見解は明確でした。</p>
+      <div class="highlight-box">
+        GitHub private repository（無料・無制限）にpushするのが最もコスパの良いバックアップ。
+      </div>
+    </div>
+  </div>
+
+  <div class="qa-block">
+    <div class="question">
+      <span class="q-label">Q</span>
+      リポジトリが30個になるのは多すぎない？ パスが崩れたり、プログラムが壊れたりしない？
+    </div>
+    <div class="answer">
+      <p>全く問題ないです。GitHub無料プランで<strong>private repo数は無制限</strong>。プロのエンジニアは数十〜数百個のリポジトリを持つのが普通です。</p>
+      <p>それから、pushしてもローカルのフォルダ構成は一切変わりません。プログラムの動作も何も影響を受けません。</p>
+    </div>
+  </div>
+
+  <div class="qa-block">
+    <div class="question">
+      <span class="q-label">Q</span>
+      あ、そうなんだ。じゃあGitHubは「コードの金庫」みたいなもので、動かすのは引き続きローカルのファイルってことか。
+    </div>
+    <div class="answer">
+      <p>その通りです。GitHubにpushした後も、動かすのは今まで通りローカルのファイルです。</p>
+      <p>Macが壊れたら新しいMacでGitHubから <code>git clone</code> して復元する。それだけの話です。</p>
+    </div>
+  </div>
+
+  <!-- Chapter 2 -->
+  <hr class="section-divider">
+  <div class="chapter-heading" id="ch2">Chapter 2</div>
+  <h2>ビルドとデプロイ — コードはどこで動いているのか</h2>
+
+  <div class="qa-block">
+    <div class="question">
+      <span class="q-label">Q</span>
+      GitHubにpushしたコードは、結局どこで動くの？ ローカル？ クラウド？
+    </div>
+    <div class="answer">
+      <p>実は2種類あります。</p>
+      <table>
+        <tr><th></th><th>実行場所</th><th>仕組み</th><th>例</th></tr>
+        <tr><td>💻</td><td><strong>ローカル（自分のMac）</strong></td><td>macOSの定期実行機能で動かす</td><td>データ収集、ファイル整理、OCR処理</td></tr>
+        <tr><td>☁️</td><td><strong>クラウド（サーバー）</strong></td><td>GitHubにpush → 自動デプロイ</td><td>管理画面、Webアプリ、社内Wiki</td></tr>
+      </table>
+      <ul>
+        <li>クラウドで動いているもの → <strong>自分のMacが閉じていてもユーザーがアクセスできる</strong></li>
+        <li>ローカルで動いているもの → <strong>Macが起動していないと止まる</strong></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="qa-block">
+    <div class="question">
+      <span class="q-label">Q</span>
+      なるほど。コードをGitHubにプッシュして、それがクラウドのサーバーにデプロイされて、動くのはサーバー上で動く。これが「クラウドで動いている」ということだよね。
+    </div>
+    <div class="answer">
+      <p>はい、その理解で正確です。流れとしてはこうなります：</p>
+      <div class="flow-diagram">
+        <div class="flow-row">
+          <div class="flow-box local">① ローカルでコードを書く</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-box github">② GitHubにpush</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-box server">③ サーバーがビルド＆デプロイ</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-box user">④ ユーザーがアクセス</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="qa-block">
+    <div class="question">
+      <span class="q-label">Q</span>
+      ビルドって何？ ビルドの後にデプロイなんだよね。デプロイは「送る」みたいな意味？
+    </div>
+    <div class="answer">
+      <ul>
+        <li><strong>ビルド</strong> = 人間が書いたコードを、<strong>ブラウザが読める形に変換すること</strong>。たくさんのファイルが数個のファイルにまとまり、圧縮される</li>
+        <li><strong>デプロイ</strong> = ビルドされたファイルを<strong>サーバーに送って公開すること</strong></li>
+      </ul>
+      <p>Netlifyのようなサービスはこの「ビルド→デプロイ」を自動でやってくれるので、開発者はGitHubにpushするだけで済みます。</p>
+    </div>
+  </div>
+
+  <div class="qa-block">
+    <div class="question">
+      <span class="q-label">Q</span>
+      ユーザーがデプロイされた、ビルドされたものを見た場合に、元のコードがわからないよね。ビルドされた状態だから結果しかわからない。その裏側のコードがどうなっているのか、これを「ソースコード」と言うんだよね。
+    </div>
+    <div class="answer">
+      <p>完璧な理解です。</p>
+      <table>
+        <tr><th></th><th>名前</th><th>中身</th></tr>
+        <tr><td>📝</td><td><strong>ソースコード</strong></td><td>人間が書いた元のコード</td></tr>
+        <tr><td>📦</td><td><strong>ビルド成果物</strong></td><td>ブラウザ用に変換・圧縮されたもの</td></tr>
+      </table>
+      <p>ビルド成果物は変数名も短縮されて1行にまとめられるので、人間が読んでもまず解読できません。</p>
+      <p>だからこそ、<strong>元のソースコードをGitHubに保管しておく必要がある</strong>んです。</p>
+    </div>
+  </div>
+
+  <!-- Chapter 3 -->
+  <hr class="section-divider">
+  <div class="chapter-heading" id="ch3">Chapter 3</div>
+  <h2>Git操作の基本 — commit / push / pull</h2>
+
+  <div class="qa-block">
+    <div class="question">
+      <span class="q-label">Q</span>
+      コミットって何？
+    </div>
+    <div class="answer">
+      <p><strong>「この時点のコードを記録する」操作</strong>です。ゲームのセーブポイントみたいなものです。</p>
+      <div class="code-block">作業1: ログイン画面を作った → コミット💾（セーブ）
+作業2: メール一覧を作った   → コミット💾（セーブ）
+作業3: バグを直した         → コミット💾（セーブ）</div>
+      <p>各コミットにはメッセージをつけます。例えば「認証トークンの期限切れ対応を修正」のように。</p>
+      <p>これにより<strong>「いつ、何を変えたか」の履歴が全部残ります。</strong>問題が起きたら特定のコミットまで巻き戻すこともできます。</p>
+    </div>
+  </div>
+
+  <div class="qa-block">
+    <div class="question">
+      <span class="q-label">Q</span>
+      コミットとプッシュの関係は？
+    </div>
+    <div class="answer">
+      <div class="flow-diagram">
+        <div class="flow-row">
+          <div class="flow-box local">コードを書く</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-box server">commit（ローカルに記録）</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-box github">push（GitHubに送る）</div>
+        </div>
+      </div>
+      <p>commitは<strong>ローカルだけの操作</strong>です。何回commitしても、pushするまでGitHubには反映されません。</p>
+      <div class="highlight-box">
+        こまめにcommitして、区切りの良いところでpush。これが基本です。
+      </div>
+    </div>
+  </div>
+
+  <div class="qa-block">
+    <div class="question">
+      <span class="q-label">Q</span>
+      プッシュは自分でGitHubに変更を送ること。プルは何？
+    </div>
+    <div class="answer">
+      <p>逆です。<strong>GitHubの変更をローカルに取ってくること</strong>です。</p>
+      <p>別のPCやチームメンバーがGitHubにpushした変更を、自分のPCに反映するときに <code>git pull</code> します。1人で開発している場合はあまり使う場面はありません。</p>
+    </div>
+  </div>
+
+  <!-- Chapter 4 -->
+  <hr class="section-divider">
+  <div class="chapter-heading" id="ch4">Chapter 4</div>
+  <h2>プルリクエストとコンフリクト</h2>
+
+  <div class="qa-block">
+    <div class="question">
+      <span class="q-label">Q</span>
+      プルリクエスト（PR）って何？ プッシュとどう違うの？
+    </div>
+    <div class="answer">
+      <ul>
+        <li><strong>プッシュ</strong> = 自分で直接コードを変更する</li>
+        <li><strong>プルリクエスト</strong> = 「この変更を取り込んでください」という<strong>提案</strong></li>
+      </ul>
+      <p>チーム開発で使われる流れ：</p>
+      <ol>
+        <li>メインのコードとは別の「ブランチ（枝）」で変更を作る</li>
+        <li>「この変更をメインに取り込んで（pullして）ほしい」とリクエストを出す</li>
+        <li>チームメンバーが<strong>レビュー</strong>して、OKなら取り込む</li>
+      </ol>
+      <div class="highlight-box">
+        つまりプッシュが「自分で直接変える」なら、プルリクは「<strong>レビューが入る</strong>」という違いです。
+      </div>
+    </div>
+  </div>
+
+  <div class="qa-block">
+    <div class="question">
+      <span class="q-label">Q</span>
+      ローカルにプルしてきた後に変更を加えて、プッシュまたはプルリクするときに、本体の方でも更新がかかって、差分に矛盾が生まれた場合、どうなるの？
+    </div>
+    <div class="answer">
+      <p>それが<strong>コンフリクト（競合）</strong>と呼ばれるものです。</p>
+
+      <div class="compare-row">
+        <div class="compare-box ok">
+          <div class="label">✅ 矛盾がない場合</div>
+          Gitが自動でマージ（合体）してくれる。Aさんが1行目を、Bさんが50行目を変えた場合 → 別の場所なので自動で両方反映。
+        </div>
+        <div class="compare-box ng">
+          <div class="label">❌ 矛盾がある場合</div>
+          同じ行を別々に変えた場合、Gitは「どっちが正しいかわからない」と止まる。人間が判断する必要がある。
+        </div>
+      </div>
+
+      <p>コンフリクトが発生すると、コードにはこんなマークが付きます：</p>
+      <div class="code-block"><span class="comment">&lt;&lt;&lt;&lt;&lt;&lt;&lt; あなたの変更</span>
+const color = 'blue'
+<span class="comment">=======</span>
+const color = 'red'
+<span class="comment">&gt;&gt;&gt;&gt;&gt;&gt;&gt; 相手の変更</span></div>
+    </div>
+  </div>
+
+  <div class="qa-block">
+    <div class="question">
+      <span class="q-label">Q</span>
+      なるほど、プルリクするときに事前にコンフリクトを検知してレビューするってことか。開発ブランチを切ってプルした後に開発して、もう一回プルして確認してからプルリクないしプッシュするっていうこともあるよね。それでもコンフリクトは起きる？ その場合、個人で解決するの？
+    </div>
+    <div class="answer">
+      <p>はい、もちろんあります。むしろ一般的です。</p>
+      <p>よくある流れ：</p>
+      <ol>
+        <li>ブランチを切って開発する</li>
+        <li>開発中にmain（本体）が進む（別の変更がマージされた等）</li>
+        <li><code>git pull origin main</code> で最新を取り込もうとする</li>
+        <li><strong>コンフリクト発生</strong></li>
+        <li>自分で該当箇所を見て、どちらを採用するか判断して修正</li>
+        <li>修正をcommitして続行</li>
+      </ol>
+      <p>コンフリクトの解決自体は「このファイルのこの行、どっちの書き方が正しい？」という判断です。コードを理解している人なら誰でもできます。</p>
+    </div>
+  </div>
+
+  <div class="qa-block">
+    <div class="question">
+      <span class="q-label">Q</span>
+      みんながその「作業前にpullする」習慣が必要なんだね。それ意外と難しいな。リテラシーがない人もいるわけだし。コードレビューもClaude Codeがやっていくことになりそうだ。
+    </div>
+    <div class="answer">
+      <p>まさにそうだと思います。</p>
+      <p>実際、現時点でもClaude Codeがcommitメッセージを書いてpushまでやりますし、レビュー機能も備えています。<strong>Gitのリテラシーがなくても安全に開発できる方向</strong>に確実に進んでいます。</p>
+    </div>
+  </div>
+
+  <!-- Chapter 5 -->
+  <hr class="section-divider">
+  <div class="chapter-heading" id="ch5">Chapter 5</div>
+  <h2>複数人での開発とデータベース</h2>
+
+  <div class="qa-block">
+    <div class="question">
+      <span class="q-label">Q</span>
+      複数人がClaude Codeで同じプロジェクトを進める場合、誰かがGitHubでプロジェクトを立ち上げて、コントリビューター（貢献者）としてみんながプルリクしていくっていう流れになる？
+    </div>
+    <div class="answer">
+      <p>はい、基本的にはその流れです。</p>
+      <ol>
+        <li>誰かがGitHubにリポジトリを作る</li>
+        <li>各メンバーがclone（コピー）して、ブランチを切って開発</li>
+        <li>プルリクで変更を提案 → レビュー → マージ</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="qa-block">
+    <div class="question">
+      <span class="q-label">Q</span>
+      この場合、データベースをどうするかが気になるな。コードはGitHubで共有できるけど、データはどうするんだろう。
+    </div>
+    <div class="answer">
+      <p>鋭いポイントです。<strong>コードはGitHubで共有できるが、データベースはそうはいかない。</strong>ここが難しいところです。</p>
+      <p>よくある3パターン：</p>
+      <table>
+        <tr><th>構成</th><th>本番DB</th><th>開発DB</th><th>向いている規模</th></tr>
+        <tr><td><strong>スプレッドシート型</strong></td><td>Google Sheets 1つを共用</td><td>同じものを使う</td><td>〜数百件、少人数</td></tr>
+        <tr><td><strong>ローカルDB分離型</strong></td><td>クラウドDB 1つ</td><td>各自のPCにテスト用DB</td><td>スタートアップ</td></tr>
+        <tr><td><strong>完全分離型</strong></td><td>本番DB</td><td>ステージングDB + 開発DB</td><td>大規模チーム</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="qa-block">
+    <div class="question">
+      <span class="q-label">Q</span>
+      ローカルDBって、ソフトウェアとして何に乗っかってるの？ Google Sheetsでもいいし、単純なCSVデータでもいいわけか。
+    </div>
+    <div class="answer">
+      <p>その通りです。CSVでもGoogle Sheetsでも「データベース」にはなります。用途によって適切なものが変わるだけです。</p>
+      <table>
+        <tr><th>種類</th><th>例</th><th>特徴</th></tr>
+        <tr><td><strong>スプレッドシート</strong></td><td>Google Sheets</td><td>人間が見やすい、小規模向け</td></tr>
+        <tr><td><strong>ファイルDB</strong></td><td>SQLite</td><td>ファイル1個で完結、サーバー不要</td></tr>
+        <tr><td><strong>サーバーDB</strong></td><td>PostgreSQL, MySQL</td><td>大規模・高速・同時アクセスに強い</td></tr>
+        <tr><td><strong>クラウドDB</strong></td><td>Supabase, PlanetScale</td><td>サーバーDBのクラウド版、管理不要</td></tr>
+      </table>
+      <div class="highlight-box">
+        小規模なら Google Sheetsを本番用と開発用の2つに分けるだけで十分。SQLiteやPostgreSQLへの移行が必要になるのは、データが数万件を超えたり、複雑な検索が必要になってからです。
+      </div>
+    </div>
+  </div>
+
+  <!-- Chapter 6 -->
+  <hr class="section-divider">
+  <div class="chapter-heading" id="ch6">Chapter 6</div>
+  <h2>.envファイルと秘密情報の管理</h2>
+
+  <div class="qa-block">
+    <div class="question">
+      <span class="q-label">Q</span>
+      .envファイルってよく出てくるけど、何のファイルなの？
+    </div>
+    <div class="answer">
+      <p>APIキーやパスワードなどの<strong>秘密情報を書いておくファイル</strong>です。</p>
+      <div class="code-block"><span class="label">.env</span>
+GOOGLE_CLIENT_SECRET=xxxxxxxxxxxxx
+API_KEY=sk-ant-xxxxxxxxxxxxx</div>
+      <p>こういう情報をコードに直接書くと危険なので、<code>.env</code>という別ファイルに分けて書き、プログラムがそこから読み込む仕組みです。</p>
+    </div>
+  </div>
+
+  <div class="qa-block">
+    <div class="question">
+      <span class="q-label">Q</span>
+      これ、GitHubにpushしないファイルなんだよね？ ということはローカルにしかない。なくなったら消えちゃう情報ってこと？
+    </div>
+    <div class="answer">
+      <p>鋭い。はい、<code>.env</code>はGitHubには上げません。</p>
+      <p><code>.gitignore</code>という<strong>「GitHubに送らないファイルリスト」</strong>に入れて除外します。これは開発者の間では常識中の常識で、フレームワーク（Vite、Next.js等）が新規プロジェクト作成時に自動で設定してくれることも多いです。</p>
+    </div>
+  </div>
+
+  <div class="qa-block">
+    <div class="question">
+      <span class="q-label">Q</span>
+      じゃあ本番のサーバーはどこから秘密情報を読んでるの？
+    </div>
+    <div class="answer">
+      <p>本番とローカルで設定場所が完全に分かれています。</p>
+      <table>
+        <tr><th></th><th>場所</th><th>設定方法</th><th>用途</th></tr>
+        <tr><td>☁️</td><td><strong>クラウドサーバー（本番）</strong></td><td>サーバーの管理画面で直接設定</td><td>本番用の秘密情報</td></tr>
+        <tr><td>💻</td><td><strong>ローカル（開発）</strong></td><td><code>.env</code>ファイル</td><td>開発用の秘密情報</td></tr>
+      </table>
+      <p>だから<code>.env</code>が消えても<strong>本番は影響ゼロ</strong>です。ローカルで開発するときに再設定が面倒、という程度の話。しかもサーバーの管理画面に同じ値が入っているので、最悪そこから確認して復元できます。</p>
+    </div>
+  </div>
+
+  <div class="qa-block">
+    <div class="question">
+      <span class="q-label">Q</span>
+      なるほど。GitHubに上げていく.envファイルはローカルの方から上げるわけだから……いや待って、.envはGitHubには上げないんだったよね。
+    </div>
+    <div class="answer">
+      <p>そうです。整理するとこうなります：</p>
+      <div class="highlight-box">
+        <strong>GitHub</strong> → <code>.env</code>は含まれない（<code>.gitignore</code>で除外）<br>
+        <strong>サーバー</strong> → 管理画面で環境変数を直接設定（本番用）<br>
+        <strong>ローカル</strong> → <code>.env</code>ファイルで設定（開発用）
+      </div>
+      <p><code>.env</code>はあくまで<strong>ローカル専用</strong>の設定ファイルです。</p>
+    </div>
+  </div>
+
+  <div class="qa-block">
+    <div class="question">
+      <span class="q-label">Q</span>
+      本番用と開発用でDBを分けるっていうのも、この.envを変えるだけでできるの？
+    </div>
+    <div class="answer">
+      <p>その通りです。<code>.env</code>の中のデータベースのIDを開発用に差し替えるだけで、同じコードが開発用DBを参照するようになります。</p>
+      <div class="highlight-box">
+        コードは一切変えずに、接続先だけ切り替える。これが <code>.env</code> の便利なところです。
+      </div>
+    </div>
+  </div>
+
+  <!-- Chapter 7 -->
+  <hr class="section-divider">
+  <div class="chapter-heading" id="ch7">Chapter 7</div>
+  <h2>launchdとは</h2>
+
+  <div class="qa-block">
+    <div class="question">
+      <span class="q-label">Q</span>
+      launchdってシェルスクリプトみたいなもの？
+    </div>
+    <div class="answer">
+      <p>少し違います。</p>
+      <table>
+        <tr><th></th><th>名前</th><th>役割</th></tr>
+        <tr><td>📋</td><td><strong>シェルスクリプト</strong></td><td>「<strong>何をするか</strong>」の手順書（例：ファイルを整理する手順）</td></tr>
+        <tr><td>⏰</td><td><strong>launchd</strong></td><td>「<strong>いつ実行するか</strong>」を管理するmacOSの仕組み（例：毎月1日の朝9時に実行）</td></tr>
+      </table>
+      <p>Windowsでいう「タスクスケジューラ」、スマホでいう「アラーム」と同じ役割です。macOSに最初から入っている機能で、設定ファイル（<code>.plist</code>）を書くだけで使えます。</p>
+    </div>
+  </div>
+
+  <!-- Summary -->
+  <hr class="section-divider">
+  <div class="chapter-heading" id="summary">Summary</div>
+  <h2>まとめ：全体の関係図</h2>
+
+  <h3>開発の流れ</h3>
+  <div class="flow-diagram">
+    <div class="flow-row">
+      <div class="flow-box local">コードを書く</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-box server">commit（記録）</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-box github">push（GitHubに送る）</div>
+    </div>
+    <div class="flow-row" style="margin-top: 8px;">
+      <span class="flow-arrow">↓</span>
+    </div>
+    <div class="flow-row">
+      <div class="flow-box server">サーバーがビルド（変換）</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-box server">デプロイ（公開）</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-box user">ユーザーがブラウザでアクセス</div>
+    </div>
+  </div>
+
+  <h3>ファイルの所在</h3>
+  <div class="summary-card">
+    <table>
+      <tr><th>ファイル</th><th>場所</th></tr>
+      <tr><td><strong>ソースコード</strong></td><td>ローカル + GitHub（バックアップ）</td></tr>
+      <tr><td><strong>.envファイル</strong></td><td>ローカルのみ（GitHubには上げない）</td></tr>
+      <tr><td><strong>本番の秘密情報</strong></td><td>サーバー管理画面（クラウド）</td></tr>
+      <tr><td><strong>ビルド成果物</strong></td><td>サーバー上（クラウド）</td></tr>
+    </table>
+  </div>
+
+  <h3>チーム開発の場合</h3>
+  <div class="flow-diagram">
+    <div class="flow-row">
+      <div class="flow-box local">各自がブランチで開発</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-box server">プルリクエスト</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-box github">レビュー → マージ</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-box user">自動デプロイ</div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <p>2026年3月 — AIコーディングツールとの対話から生まれた講義ノート</p>
+    <p style="margin-top: 8px;"><a href="./">← Claude 導入マニュアル トップへ</a></p>
+  </div>
+</div>
+
+</body>
+</html>
